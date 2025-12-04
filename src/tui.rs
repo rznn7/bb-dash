@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::{FutureExt, StreamExt};
 use ratatui::{
@@ -11,34 +13,64 @@ use ratatui::{
 };
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 
-use crate::bitbucket_repo::BitbucketRepo;
+use crate::{
+    bitbucket_client::{self, Account},
+    bitbucket_repo::BitbucketRepo,
+    bitbucket_service::BitbucketClient,
+};
 
 pub struct App {
     is_running: bool,
     event_stream: EventStream,
     selected_tab: SelectedTab,
     repo_path: String,
-    bitbucket_repo: Option<BitbucketRepo>,
+    bitbucket_repo: BitbucketRepo,
+    current_user: Option<Account>,
+    bitbucket_client: BitbucketClient,
 }
 
 impl App {
+    const FRAMES_PER_SECOND: f32 = 60.0;
+
     pub fn new(repo_path: Option<String>) -> anyhow::Result<Self> {
         let repo_path = repo_path.unwrap_or(String::from("."));
-        let bitbucket_repo = Some(BitbucketRepo::new(&repo_path)?);
+        let bitbucket_repo = BitbucketRepo::new(&repo_path)?;
         Ok(Self {
             is_running: false,
             event_stream: EventStream::default(),
             selected_tab: SelectedTab::default(),
             repo_path,
             bitbucket_repo,
+            current_user: None,
+            bitbucket_client: BitbucketClient::from_env()?,
         })
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
+        let period = Duration::from_secs_f32(1.0 / Self::FRAMES_PER_SECOND);
+        let mut interval = tokio::time::interval(period);
+
+        let (tx, mut rx) = tokio::sync::oneshot::channel();
+        let bitbucket_client = self.bitbucket_client.clone();
+        tokio::spawn(async move {
+            let user = bitbucket_client.get_user().await;
+            tx.send(user).ok()
+        });
         self.is_running = true;
         while self.is_running {
-            terminal.draw(|frame| self.draw(frame))?;
-            self.handle_crossterm_events().await?;
+            if let Ok(Ok(user)) = rx.try_recv() {
+                self.current_user = Some(user);
+            }
+
+            tokio::select! {
+                _ = interval.tick() => {terminal.draw(|frame| self.draw(frame))?;},
+                next_event = self.event_stream.next() => {
+                    if let Some(Ok(Event::Key(key_event))) = next_event {
+                        self.handle_key_event(key_event)
+                    }
+                },
+
+            }
         }
         Ok(())
     }
@@ -63,28 +95,26 @@ impl App {
             main_area,
         );
 
-        let [app_title, repo_slug] = Layout::horizontal([Max(9), Fill(1)]).areas(footer);
+        let [app_title, user_name, repo_slug] =
+            Layout::horizontal([Max(9), Max(9), Fill(1)]).areas(footer);
 
         frame.render_widget(
             Paragraph::new(" bb-dash ").style(Style::default().reversed().fg(Color::Blue).bold()),
             app_title,
         );
 
-        let repo_slug_content = if let Some(bitbucket_repo) = &self.bitbucket_repo {
-            bitbucket_repo.slug()
+        let user_name_content = if let Some(user) = &self.current_user {
+            user.display_name.clone()
         } else {
-            "loading..."
+            String::from("...")
         };
 
-        frame.render_widget(Paragraph::new(repo_slug_content), repo_slug);
-    }
+        frame.render_widget(
+            Paragraph::new(format!(" {} ", user_name_content)).style(Style::default().reversed()),
+            user_name,
+        );
 
-    async fn handle_crossterm_events(&mut self) -> Result<(), anyhow::Error> {
-        let event = self.event_stream.next().fuse().await;
-        if let Some(Ok(Event::Key(key_event))) = event {
-            self.handle_key_event(key_event)
-        }
-        Ok(())
+        frame.render_widget(Paragraph::new(self.bitbucket_repo.slug()), repo_slug);
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {

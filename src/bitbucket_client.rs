@@ -1,22 +1,23 @@
 use serde::Deserialize;
 
-#[derive(Debug)]
-pub struct BitbucketClient {
+#[derive(Clone, Debug)]
+pub struct BitbucketApi {
     http_client: reqwest::Client,
     base_url: String,
     api_token: String,
     username: String,
 }
 
-impl BitbucketClient {
+impl BitbucketApi {
     pub fn new(base_url: String, api_token: String, username: String) -> Self {
-        BitbucketClient {
+        BitbucketApi {
             http_client: reqwest::Client::new(),
             base_url,
             api_token,
             username,
         }
     }
+
     pub async fn get_current_user(&self) -> Result<Account, reqwest::Error> {
         let url = format!("{}/user", &self.base_url);
 
@@ -66,9 +67,9 @@ impl BitbucketClient {
 #[derive(Deserialize, Debug)]
 pub struct Account {
     #[serde(rename = "type")]
-    _type: String,
-    links: AccountLinks,
-    display_name: String,
+    pub _type: String,
+    pub links: AccountLinks,
+    pub display_name: String,
     pub uuid: String,
 }
 

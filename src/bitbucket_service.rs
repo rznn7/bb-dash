@@ -1,19 +1,16 @@
-use anyhow::Context;
+use crate::bitbucket_client::{Account, BitbucketApi};
 
-use crate::bitbucket_client::{
-    Account, BitbucketClient, PaginatedPullRequests, PaginatedWorkspaceMembership,
-};
-
-pub struct BitbucketService {
-    client: BitbucketClient,
+#[derive(Clone, Debug)]
+pub struct BitbucketClient {
+    bitbucket_api: BitbucketApi,
 }
 
-impl BitbucketService {
+impl BitbucketClient {
     pub fn from_env() -> Result<Self, std::env::VarError> {
         dotenv::dotenv().ok();
 
-        Ok(BitbucketService {
-            client: BitbucketClient::new(
+        Ok(BitbucketClient {
+            bitbucket_api: BitbucketApi::new(
                 std::env::var("BITBUCKET_BASE_URL")?,
                 std::env::var("BITBUCKET_API_TOKEN")?,
                 std::env::var("BITBUCKET_USERNAME")?,
@@ -21,25 +18,8 @@ impl BitbucketService {
         })
     }
 
-    pub async fn get_authored_pull_requests(&self) -> Result<PaginatedPullRequests, anyhow::Error> {
-        let Account {
-            uuid: user_uuid, ..
-        } = self.client.get_current_user().await?;
-
-        let PaginatedWorkspaceMembership {
-            values: workspace_memberships,
-            ..
-        } = self.client.list_workspaces_for_current_user().await?;
-
-        let workspace_uuid = &workspace_memberships
-            .first()
-            .context("Failed to find the first workspace uuid")?
-            .workspace
-            .uuid;
-
-        Ok(self
-            .client
-            .list_workspaces_pull_requests_for_a_user(&user_uuid, workspace_uuid)
-            .await?)
+    pub async fn get_user(&self) -> Result<Account, anyhow::Error> {
+        let user = self.bitbucket_api.get_current_user().await?;
+        Ok(user)
     }
 }

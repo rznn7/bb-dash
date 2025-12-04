@@ -1,8 +1,9 @@
 #![allow(dead_code)]
 
-use crate::{bitbucket_service::BitbucketService, tui::App};
+use crate::tui::App;
 
 mod bitbucket_client;
+mod bitbucket_repo;
 mod bitbucket_service;
 mod tui;
 
@@ -13,11 +14,3 @@ async fn main() -> Result<(), anyhow::Error> {
     ratatui::restore();
     result
 }
-
-//let pull_requests = BitbucketService::from_env()?
-//    .get_authored_pull_requests()
-//    .await?;
-
-//pull_requests.values.iter().for_each(|p| print!("{:#?}", p));
-
-//Ok(())

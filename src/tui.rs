@@ -1,4 +1,4 @@
-use crossterm::event::{Event, EventStream, KeyCode, KeyEvent, KeyModifiers};
+use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::{FutureExt, StreamExt};
 use ratatui::{
     DefaultTerminal, Frame,
@@ -7,7 +7,7 @@ use ratatui::{
         Layout,
     },
     style::{Color, Style, Stylize},
-    widgets::{Block, Padding, Paragraph, Tabs, Widget},
+    widgets::{Paragraph, Tabs},
 };
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 

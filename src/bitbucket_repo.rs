@@ -8,9 +8,9 @@ pub struct BitbucketRepo {
 }
 
 impl BitbucketRepo {
-    pub fn new() -> Result<Self> {
-        Self::verify_git_repo()?;
-        let (workspace, slug) = Self::get_repo_workspace_and_slug()?;
+    pub fn new(repo_path: &str) -> Result<Self> {
+        Self::verify_git_repo(repo_path)?;
+        let (workspace, slug) = Self::get_repo_workspace_and_slug(repo_path)?;
         Ok(Self { workspace, slug })
     }
 
@@ -22,11 +22,13 @@ impl BitbucketRepo {
         &self.slug
     }
 
-    fn verify_git_repo() -> Result<()> {
-        let output = process::Command::new("git")
-            .args(["rev-parse", "--is-inside-work-tree"])
-            .output()
-            .context("failed to execute git command")?;
+    fn verify_git_repo(repo_path: &str) -> Result<()> {
+        let mut cmd = process::Command::new("git");
+        cmd.args(["rev-parse", "--is-inside-work-tree"]);
+
+        cmd.current_dir(repo_path);
+
+        let output = cmd.output().context("failed to execute git command")?;
 
         if !output.status.success() {
             bail!("not in a git repository");
@@ -35,11 +37,12 @@ impl BitbucketRepo {
         Ok(())
     }
 
-    fn get_repo_workspace_and_slug() -> Result<(String, String)> {
-        let output = process::Command::new("git")
-            .args(["remote", "get-url", "origin"])
-            .output()
-            .context("failed to execute git command")?;
+    fn get_repo_workspace_and_slug(repo_path: &str) -> Result<(String, String)> {
+        let mut cmd = process::Command::new("git");
+        cmd.args(["remote", "get-url", "origin"]);
+        cmd.current_dir(repo_path);
+
+        let output = cmd.output().context("failed to execute git command")?;
         let remote_url = String::from_utf8(output.stdout)
             .context("failed to convert git origin url to String")?
             .trim()

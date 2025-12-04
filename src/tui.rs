@@ -3,7 +3,7 @@ use futures::{FutureExt, StreamExt};
 use ratatui::{
     DefaultTerminal, Frame,
     layout::{
-        Constraint::{Length, Min},
+        Constraint::{Fill, Length, Max, Min},
         Layout,
     },
     style::{Color, Style, Stylize},
@@ -11,24 +11,27 @@ use ratatui::{
 };
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 
-#[derive(Default)]
+use crate::bitbucket_repo::BitbucketRepo;
+
 pub struct App {
     is_running: bool,
     event_stream: EventStream,
-
     selected_tab: SelectedTab,
+    repo_path: String,
+    bitbucket_repo: Option<BitbucketRepo>,
 }
 
 impl App {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
-    fn switch_current_tab(&mut self) {
-        self.selected_tab = match self.selected_tab {
-            SelectedTab::MyPullRequests => SelectedTab::NeedMyReview,
-            SelectedTab::NeedMyReview => SelectedTab::MyPullRequests,
-        }
+    pub fn new(repo_path: Option<String>) -> anyhow::Result<Self> {
+        let repo_path = repo_path.unwrap_or(String::from("."));
+        let bitbucket_repo = Some(BitbucketRepo::new(&repo_path)?);
+        Ok(Self {
+            is_running: false,
+            event_stream: EventStream::default(),
+            selected_tab: SelectedTab::default(),
+            repo_path,
+            bitbucket_repo,
+        })
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
@@ -59,10 +62,21 @@ impl App {
             Paragraph::new(format!("in tab: {}", current_tab_name)),
             main_area,
         );
+
+        let [app_title, repo_slug] = Layout::horizontal([Max(9), Fill(1)]).areas(footer);
+
         frame.render_widget(
             Paragraph::new(" bb-dash ").style(Style::default().reversed().fg(Color::Blue).bold()),
-            footer,
+            app_title,
         );
+
+        let repo_slug_content = if let Some(bitbucket_repo) = &self.bitbucket_repo {
+            bitbucket_repo.slug()
+        } else {
+            "loading..."
+        };
+
+        frame.render_widget(Paragraph::new(repo_slug_content), repo_slug);
     }
 
     async fn handle_crossterm_events(&mut self) -> Result<(), anyhow::Error> {

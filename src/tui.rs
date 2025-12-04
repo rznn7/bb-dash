@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
-use futures::{FutureExt, StreamExt};
+use futures::StreamExt;
 use ratatui::{
     DefaultTerminal, Frame,
     layout::{
@@ -14,9 +14,7 @@ use ratatui::{
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 
 use crate::{
-    bitbucket_client::{self, Account},
-    bitbucket_repo::BitbucketRepo,
-    bitbucket_service::BitbucketClient,
+    bitbucket_api::Account, bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo,
 };
 
 pub struct App {

@@ -3,9 +3,9 @@
 use crate::tui::App;
 use std::env;
 
+mod bitbucket_api;
 mod bitbucket_client;
 mod bitbucket_repo;
-mod bitbucket_service;
 mod tui;
 
 #[tokio::main]

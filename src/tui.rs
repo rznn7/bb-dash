@@ -1,21 +1,20 @@
-use std::time::Duration;
-
+use crate::{
+    bitbucket_api::Account, bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo,
+};
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
 use ratatui::{
     DefaultTerminal, Frame,
+    buffer::Buffer,
     layout::{
         Constraint::{Fill, Length, Max, Min},
-        Layout,
+        Layout, Rect,
     },
     style::{Color, Style, Stylize},
-    widgets::{Paragraph, Tabs},
+    widgets::{Paragraph, Tabs, Widget},
 };
+use std::time::Duration;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
-
-use crate::{
-    bitbucket_api::Account, bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo,
-};
 
 pub struct App {
     is_running: bool,
@@ -23,13 +22,11 @@ pub struct App {
     selected_tab: SelectedTab,
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
-    current_user: Option<Account>,
+    current_account: Option<Account>,
     bitbucket_client: BitbucketClient,
 }
 
 impl App {
-    const FRAMES_PER_SECOND: f32 = 60.0;
-
     pub fn new(repo_path: Option<String>) -> anyhow::Result<Self> {
         let repo_path = repo_path.unwrap_or(String::from("."));
         let bitbucket_repo = BitbucketRepo::new(&repo_path)?;
@@ -39,26 +36,20 @@ impl App {
             selected_tab: SelectedTab::default(),
             repo_path,
             bitbucket_repo,
-            current_user: None,
+            current_account: None,
             bitbucket_client: BitbucketClient::from_env()?,
         })
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
-        let period = Duration::from_secs_f32(1.0 / Self::FRAMES_PER_SECOND);
-        let mut interval = tokio::time::interval(period);
+        let mut interval = get_app_interval();
+        let mut account_connected_fetcher = AccountConnectedFetcher::new(&self.bitbucket_client);
 
-        let (tx, mut rx) = tokio::sync::oneshot::channel();
-        let bitbucket_client = self.bitbucket_client.clone();
-        tokio::spawn(async move {
-            let user = bitbucket_client.get_user().await;
-            tx.send(user).ok()
-        });
         self.is_running = true;
         while self.is_running {
-            if let Ok(Ok(user)) = rx.try_recv() {
-                self.current_user = Some(user);
-            }
+            self.current_account = self
+                .current_account
+                .or_else(|| account_connected_fetcher.try_get());
 
             tokio::select! {
                 _ = interval.tick() => {terminal.draw(|frame| self.draw(frame))?;},
@@ -93,24 +84,27 @@ impl App {
             main_area,
         );
 
-        let [app_title, user_name, repo_slug] =
-            Layout::horizontal([Max(9), Max(9), Fill(1)]).areas(footer);
+        let app_title_text = String::from("  bb-dash ");
+        let app_title_char_count = app_title_text.chars().count() as u16;
+
+        let account_connected_widget = AccountConnectedWidget {
+            current_account: &self.current_account,
+        };
+
+        let [app_title, user_name, repo_slug] = Layout::horizontal([
+            Max(app_title_char_count),
+            Max(account_connected_widget.size()),
+            Fill(1),
+        ])
+        .areas(footer);
 
         frame.render_widget(
-            Paragraph::new(" bb-dash ").style(Style::default().reversed().fg(Color::Blue).bold()),
+            Paragraph::new(app_title_text)
+                .style(Style::default().reversed().fg(Color::Blue).bold()),
             app_title,
         );
 
-        let user_name_content = if let Some(user) = &self.current_user {
-            user.display_name.clone()
-        } else {
-            String::from("...")
-        };
-
-        frame.render_widget(
-            Paragraph::new(format!(" {} ", user_name_content)).style(Style::default().reversed()),
-            user_name,
-        );
+        frame.render_widget(account_connected_widget, user_name);
 
         frame.render_widget(Paragraph::new(self.bitbucket_repo.slug()), repo_slug);
     }
@@ -137,6 +131,13 @@ impl App {
     }
 }
 
+const FRAMES_PER_SECOND: f32 = 60.0;
+
+fn get_app_interval() -> tokio::time::Interval {
+    let period = Duration::from_secs_f32(1.0 / FRAMES_PER_SECOND);
+    tokio::time::interval(period)
+}
+
 #[derive(Default, Clone, Copy, Display, FromRepr, EnumIter)]
 enum SelectedTab {
     #[default]
@@ -157,5 +158,55 @@ impl SelectedTab {
         let current_index = self as usize;
         let next_index = current_index.saturating_add(1);
         Self::from_repr(next_index).unwrap_or(self)
+    }
+}
+
+struct AccountConnectedFetcher {
+    rx: tokio::sync::oneshot::Receiver<Result<Account, anyhow::Error>>,
+}
+
+impl AccountConnectedFetcher {
+    fn new(bitbucket_client: &BitbucketClient) -> Self {
+        let (tx, rx) = tokio::sync::oneshot::channel();
+        let bitbucket_client = bitbucket_client.clone();
+        tokio::spawn(async move {
+            let user = bitbucket_client.get_user().await;
+            tx.send(user).ok()
+        });
+
+        Self { rx }
+    }
+
+    fn try_get(&mut self) -> Option<Account> {
+        self.rx.try_recv().ok().and_then(|r| r.ok())
+    }
+}
+
+const LOADING_TEXT: &str = "...";
+
+struct AccountConnectedWidget<'a> {
+    current_account: &'a Option<Account>,
+}
+
+impl AccountConnectedWidget<'_> {
+    fn formatted_text(&self) -> String {
+        let name = self
+            .current_account
+            .as_ref()
+            .map_or(LOADING_TEXT, |account| &account.display_name);
+
+        format!("  {} ", name)
+    }
+
+    fn size(&self) -> u16 {
+        self.formatted_text().chars().count() as u16
+    }
+}
+
+impl Widget for AccountConnectedWidget<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        Paragraph::new(self.formatted_text())
+            .style(Style::default().reversed())
+            .render(area, buf);
     }
 }

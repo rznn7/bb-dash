@@ -106,7 +106,12 @@ impl App {
 
         frame.render_widget(account_connected_widget, user_name);
 
-        frame.render_widget(Paragraph::new(self.bitbucket_repo.slug()), repo_slug);
+        frame.render_widget(
+            CurrentRepoWidget {
+                bitbucket_repo: &self.bitbucket_repo,
+            },
+            repo_slug,
+        );
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
@@ -208,5 +213,16 @@ impl Widget for AccountConnectedWidget<'_> {
         Paragraph::new(self.formatted_text())
             .style(Style::default().reversed())
             .render(area, buf);
+    }
+}
+
+struct CurrentRepoWidget<'a> {
+    bitbucket_repo: &'a BitbucketRepo,
+}
+
+impl Widget for CurrentRepoWidget<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        let formatted = format!("  {}", self.bitbucket_repo.slug());
+        Paragraph::new(formatted).render(area, buf);
     }
 }

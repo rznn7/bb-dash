@@ -30,6 +30,25 @@ impl BitbucketApi {
             .await
     }
 
+    pub async fn list_pull_requests(
+        &self,
+        workspace: &str,
+        repo_slug: &str,
+    ) -> Result<PaginatedPullRequests, reqwest::Error> {
+        let url = format!(
+            "{}/repositories/{}/{}/pullrequests",
+            &self.base_url, workspace, repo_slug
+        );
+
+        self.http_client
+            .get(url)
+            .basic_auth(&self.username, Some(&self.api_token))
+            .send()
+            .await?
+            .json::<PaginatedPullRequests>()
+            .await
+    }
+
     pub async fn list_workspaces_for_current_user(
         &self,
     ) -> Result<PaginatedWorkspaceMembership, reqwest::Error> {
@@ -123,13 +142,13 @@ pub struct PaginatedPullRequests {
 pub struct PullRequest {
     #[serde(rename = "type")]
     _type: String,
-    id: i32,
-    title: String,
+    pub id: i32,
+    pub title: String,
     summary: PullRequestSummary,
-    state: PullRequestState,
-    author: Account,
-    source: PullRequestEndpoint,
-    destination: PullRequestEndpoint,
+    pub state: PullRequestState,
+    pub author: Account,
+    pub source: PullRequestEndpoint,
+    pub destination: PullRequestEndpoint,
     merge_commit: Option<PullRequestCommit>,
 }
 
@@ -152,7 +171,7 @@ pub struct PullRequestSummary {
 #[derive(Deserialize, Debug)]
 pub struct PullRequestEndpoint {
     repository: Repository,
-    branch: PullRequestBranch,
+    pub branch: PullRequestBranch,
     commit: Option<PullRequestCommit>,
 }
 
@@ -168,7 +187,7 @@ pub struct Repository {
 
 #[derive(Deserialize, Debug)]
 pub struct PullRequestBranch {
-    name: String,
+    pub name: String,
 }
 
 #[derive(Deserialize, Debug)]

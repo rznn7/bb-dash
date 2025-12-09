@@ -1,5 +1,7 @@
 use crate::{
-    bitbucket_api::Account, bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo,
+    bitbucket_api::{Account, PaginatedPullRequests},
+    bitbucket_client::BitbucketClient,
+    bitbucket_repo::BitbucketRepo,
 };
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -23,6 +25,7 @@ pub struct App {
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
     current_account: Option<Account>,
+    my_pull_requests: Option<PaginatedPullRequests>,
     bitbucket_client: BitbucketClient,
 }
 
@@ -37,6 +40,7 @@ impl App {
             repo_path,
             bitbucket_repo,
             current_account: None,
+            my_pull_requests: None,
             bitbucket_client: BitbucketClient::from_env()?,
         })
     }
@@ -44,12 +48,18 @@ impl App {
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
         let mut interval = get_app_interval();
         let mut account_connected_fetcher = AccountConnectedFetcher::new(&self.bitbucket_client);
+        let mut my_pull_requests_fetcher =
+            MyPullRequestsFetcher::new(&self.bitbucket_client, &self.bitbucket_repo);
 
         self.is_running = true;
         while self.is_running {
             self.current_account = self
                 .current_account
                 .or_else(|| account_connected_fetcher.try_get());
+
+            self.my_pull_requests = self
+                .my_pull_requests
+                .or_else(|| my_pull_requests_fetcher.try_get());
 
             tokio::select! {
                 _ = interval.tick() => {terminal.draw(|frame| self.draw(frame))?;},
@@ -78,11 +88,19 @@ impl App {
             header,
         );
 
-        let current_tab_name = self.selected_tab.to_string();
-        frame.render_widget(
-            Paragraph::new(format!("in tab: {}", current_tab_name)),
-            main_area,
-        );
+        match self.selected_tab {
+            SelectedTab::MyPullRequests => {
+                frame.render_widget(
+                    MyPullRequestsTabWidget {
+                        pull_requests: &self.my_pull_requests,
+                    },
+                    main_area,
+                );
+            }
+            SelectedTab::NeedMyReview => {
+                frame.render_widget(Paragraph::new("NeedMyReview tab - wip"), main_area);
+            }
+        }
 
         let app_title_text = String::from("  bb-dash ");
         let app_title_char_count = app_title_text.chars().count() as u16;
@@ -187,7 +205,55 @@ impl AccountConnectedFetcher {
     }
 }
 
+struct MyPullRequestsFetcher {
+    rx: tokio::sync::oneshot::Receiver<Result<PaginatedPullRequests, anyhow::Error>>,
+}
+
+impl MyPullRequestsFetcher {
+    fn new(bitbucket_client: &BitbucketClient, bitbucket_repo: &BitbucketRepo) -> Self {
+        let (tx, rx) = tokio::sync::oneshot::channel();
+        let bitbucket_client = bitbucket_client.clone();
+        let bitbucket_repo = bitbucket_repo.clone();
+        tokio::spawn(async move {
+            let user = bitbucket_client.list_pull_requests(&bitbucket_repo).await;
+            tx.send(user).ok()
+        });
+
+        Self { rx }
+    }
+
+    fn try_get(&mut self) -> Option<PaginatedPullRequests> {
+        self.rx.try_recv().ok().and_then(|r| r.ok())
+    }
+}
+
 const LOADING_TEXT: &str = "...";
+
+struct MyPullRequestsTabWidget<'a> {
+    pull_requests: &'a Option<PaginatedPullRequests>,
+}
+
+impl Widget for MyPullRequestsTabWidget<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        let text = if let Some(paginated) = self.pull_requests {
+            paginated
+                .values
+                .iter()
+                .map(|pr| {
+                    format!(
+                        "#{} - {} ({:?}) [{}]",
+                        pr.id, pr.title, pr.state, pr.source.branch.name
+                    )
+                })
+                .collect::<Vec<String>>()
+                .join("\n")
+        } else {
+            format!(" {} ", LOADING_TEXT)
+        };
+
+        Paragraph::new(text).render(area, buf);
+    }
+}
 
 struct AccountConnectedWidget<'a> {
     current_account: &'a Option<Account>,

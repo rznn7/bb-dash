@@ -2,6 +2,7 @@ use anyhow::{Context, Result, bail};
 use regex::Regex;
 use std::process;
 
+#[derive(Clone)]
 pub struct BitbucketRepo {
     workspace: String,
     slug: String,

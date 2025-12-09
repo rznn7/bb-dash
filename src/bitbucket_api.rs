@@ -1,4 +1,5 @@
 use serde::Deserialize;
+use strum::Display;
 
 #[derive(Clone, Debug)]
 pub struct BitbucketApi {
@@ -152,7 +153,7 @@ pub struct PullRequest {
     merge_commit: Option<PullRequestCommit>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Display)]
 #[serde(rename_all = "UPPERCASE")]
 pub enum PullRequestState {
     Open,

@@ -9,11 +9,11 @@ use ratatui::{
     DefaultTerminal, Frame,
     buffer::Buffer,
     layout::{
-        Constraint::{Fill, Length, Max, Min},
+        Constraint::{self, Fill, Length, Max, Min},
         Layout, Rect,
     },
     style::{Color, Style, Stylize},
-    widgets::{Paragraph, Tabs, Widget},
+    widgets::{Block, Cell, Paragraph, Row, Table, Tabs, Widget},
 };
 use std::time::Duration;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
@@ -235,23 +235,49 @@ struct MyPullRequestsTabWidget<'a> {
 
 impl Widget for MyPullRequestsTabWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        let text = if let Some(paginated) = self.pull_requests {
-            paginated
-                .values
-                .iter()
-                .map(|pr| {
-                    format!(
-                        "#{} - {} ({:?}) [{}]",
-                        pr.id, pr.title, pr.state, pr.source.branch.name
-                    )
-                })
-                .collect::<Vec<String>>()
-                .join("\n")
-        } else {
-            format!(" {} ", LOADING_TEXT)
-        };
+        if let Some(pull_requests) = self.pull_requests {
+            let mut max_length_id = 0;
+            let mut max_length_state = 0;
+            let mut max_length_title = 0;
+            let mut max_length_source_branch = 0;
+            let mut max_length_destination_branch = 0;
+            let mut rows = Vec::new();
 
-        Paragraph::new(text).render(area, buf);
+            for pr in &pull_requests.values {
+                let id = pr.id.to_string();
+                let state = pr.state.to_string();
+                let title = pr.title.clone();
+                let source_branch = pr.source.branch.name.clone();
+                let destination_branch = pr.destination.branch.name.clone();
+
+                max_length_id = max_length_id.max(id.chars().count());
+                max_length_state = max_length_state.max(state.chars().count());
+                max_length_title = max_length_title.max(title.chars().count());
+                max_length_source_branch =
+                    max_length_source_branch.max(source_branch.chars().count());
+                max_length_destination_branch =
+                    max_length_destination_branch.max(destination_branch.chars().count());
+
+                rows.push(Row::new(vec![
+                    id,
+                    state,
+                    title,
+                    source_branch,
+                    destination_branch,
+                ]));
+            }
+
+            let widths = [
+                Constraint::Length(max_length_id as u16),
+                Constraint::Length(max_length_state as u16),
+                Constraint::Length(max_length_title as u16),
+                Constraint::Length(max_length_source_branch as u16),
+                Constraint::Length(max_length_destination_branch as u16),
+            ];
+            Table::new(rows, widths).column_spacing(1).render(area, buf);
+        } else {
+            Paragraph::new(LOADING_TEXT).render(area, buf);
+        }
     }
 }
 

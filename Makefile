@@ -19,7 +19,10 @@ generate-api:
 		--additional-properties=preferUnsignedInt=true \
 		--additional-properties=reqwestDefaultFeatures=rustls-tls \
 		--additional-properties=supportAsync=true \
-		--additional-properties=supportMiddleware=true
+		--additional-properties=supportMiddleware=true \
+		--global-property=apis=Users:Pullrequests \
+		--global-property=models \
+		--global-property=supportingFiles
 	@echo "✓ Client generated in ./bitbucket-client"
 
 # Build the project

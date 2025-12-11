@@ -129,28 +129,7 @@ impl From<&str> for ContentType {
     }
 }
 
-pub mod addon_api;
-pub mod branch_restrictions_api;
-pub mod branching_model_api;
-pub mod commit_statuses_api;
-pub mod commits_api;
-pub mod deployments_api;
-pub mod downloads_api;
-pub mod gpg_api;
-pub mod issue_tracker_api;
-pub mod pipelines_api;
-pub mod projects_api;
-pub mod properties_api;
 pub mod pullrequests_api;
-pub mod refs_api;
-pub mod reports_api;
-pub mod repositories_api;
-pub mod ssh_api;
-pub mod search_api;
-pub mod snippets_api;
-pub mod source_api;
 pub mod users_api;
-pub mod webhooks_api;
-pub mod workspaces_api;
 
 pub mod configuration;

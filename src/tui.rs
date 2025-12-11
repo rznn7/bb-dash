@@ -1,5 +1,5 @@
 use crate::{
-    bitbucket_api::{Account, PaginatedPullRequests},
+    bitbucket_api::{AppAccount, AppPaginatedPullRequests},
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
 };
@@ -24,8 +24,8 @@ pub struct App {
     selected_tab: SelectedTab,
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
-    current_account: Option<Account>,
-    my_pull_requests: Option<PaginatedPullRequests>,
+    current_account: Option<AppAccount>,
+    my_pull_requests: Option<AppPaginatedPullRequests>,
     bitbucket_client: BitbucketClient,
 }
 
@@ -185,7 +185,7 @@ impl SelectedTab {
 }
 
 struct AccountConnectedFetcher {
-    rx: tokio::sync::oneshot::Receiver<Result<Account, anyhow::Error>>,
+    rx: tokio::sync::oneshot::Receiver<Result<AppAccount, anyhow::Error>>,
 }
 
 impl AccountConnectedFetcher {
@@ -200,13 +200,13 @@ impl AccountConnectedFetcher {
         Self { rx }
     }
 
-    fn try_get(&mut self) -> Option<Account> {
+    fn try_get(&mut self) -> Option<AppAccount> {
         self.rx.try_recv().ok().and_then(|r| r.ok())
     }
 }
 
 struct MyPullRequestsFetcher {
-    rx: tokio::sync::oneshot::Receiver<Result<PaginatedPullRequests, anyhow::Error>>,
+    rx: tokio::sync::oneshot::Receiver<Result<AppPaginatedPullRequests, anyhow::Error>>,
 }
 
 impl MyPullRequestsFetcher {
@@ -222,7 +222,7 @@ impl MyPullRequestsFetcher {
         Self { rx }
     }
 
-    fn try_get(&mut self) -> Option<PaginatedPullRequests> {
+    fn try_get(&mut self) -> Option<AppPaginatedPullRequests> {
         self.rx.try_recv().ok().and_then(|r| r.ok())
     }
 }
@@ -230,7 +230,7 @@ impl MyPullRequestsFetcher {
 const LOADING_TEXT: &str = "...";
 
 struct MyPullRequestsTabWidget<'a> {
-    pull_requests: &'a Option<PaginatedPullRequests>,
+    pull_requests: &'a Option<AppPaginatedPullRequests>,
 }
 
 impl Widget for MyPullRequestsTabWidget<'_> {
@@ -282,7 +282,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
 }
 
 struct AccountConnectedWidget<'a> {
-    current_account: &'a Option<Account>,
+    current_account: &'a Option<AppAccount>,
 }
 
 impl AccountConnectedWidget<'_> {

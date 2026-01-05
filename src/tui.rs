@@ -47,9 +47,17 @@ impl App {
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
         let mut interval = get_app_interval();
-        let mut account_connected_fetcher = AccountConnectedFetcher::new(&self.bitbucket_client);
-        let mut my_pull_requests_fetcher =
-            MyPullRequestsFetcher::new(&self.bitbucket_client, &self.bitbucket_repo);
+
+        let mut account_connected_fetcher = {
+            let client = self.bitbucket_client.clone();
+            Fetcher::new(async move { client.get_user().await })
+        };
+
+        let mut my_pull_requests_fetcher = {
+            let client = self.bitbucket_client.clone();
+            let repo = self.bitbucket_repo.clone();
+            Fetcher::new(async move { client.list_pull_requests(&repo).await })
+        };
 
         self.is_running = true;
         while self.is_running {
@@ -154,7 +162,7 @@ impl App {
     }
 }
 
-const FRAMES_PER_SECOND: f32 = 60.0;
+const FRAMES_PER_SECOND: f32 = 20.0;
 
 fn get_app_interval() -> tokio::time::Interval {
     let period = Duration::from_secs_f32(1.0 / FRAMES_PER_SECOND);
@@ -184,45 +192,25 @@ impl SelectedTab {
     }
 }
 
-struct AccountConnectedFetcher {
-    rx: tokio::sync::oneshot::Receiver<Result<AppAccount, anyhow::Error>>,
+struct Fetcher<T> {
+    rx: tokio::sync::oneshot::Receiver<Result<T, anyhow::Error>>,
 }
 
-impl AccountConnectedFetcher {
-    fn new(bitbucket_client: &BitbucketClient) -> Self {
+impl<T> Fetcher<T> {
+    fn new<F>(task: F) -> Self
+    where
+        F: Future<Output = Result<T, anyhow::Error>> + Send + 'static,
+        T: Send + 'static,
+    {
         let (tx, rx) = tokio::sync::oneshot::channel();
-        let bitbucket_client = bitbucket_client.clone();
         tokio::spawn(async move {
-            let user = bitbucket_client.get_user().await;
-            tx.send(user).ok()
+            let task_result = task.await;
+            tx.send(task_result).ok()
         });
-
         Self { rx }
     }
 
-    fn try_get(&mut self) -> Option<AppAccount> {
-        self.rx.try_recv().ok().and_then(|r| r.ok())
-    }
-}
-
-struct MyPullRequestsFetcher {
-    rx: tokio::sync::oneshot::Receiver<Result<AppPaginatedPullRequests, anyhow::Error>>,
-}
-
-impl MyPullRequestsFetcher {
-    fn new(bitbucket_client: &BitbucketClient, bitbucket_repo: &BitbucketRepo) -> Self {
-        let (tx, rx) = tokio::sync::oneshot::channel();
-        let bitbucket_client = bitbucket_client.clone();
-        let bitbucket_repo = bitbucket_repo.clone();
-        tokio::spawn(async move {
-            let user = bitbucket_client.list_pull_requests(&bitbucket_repo).await;
-            tx.send(user).ok()
-        });
-
-        Self { rx }
-    }
-
-    fn try_get(&mut self) -> Option<AppPaginatedPullRequests> {
+    fn try_get(&mut self) -> Option<T> {
         self.rx.try_recv().ok().and_then(|r| r.ok())
     }
 }

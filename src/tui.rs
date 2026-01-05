@@ -13,7 +13,7 @@ use ratatui::{
         Layout, Rect,
     },
     style::{Color, Style, Stylize},
-    widgets::{Block, Cell, Paragraph, Row, Table, Tabs, Widget},
+    widgets::{Paragraph, Row, Table, Tabs, Widget},
 };
 use std::time::Duration;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
@@ -24,8 +24,8 @@ pub struct App {
     selected_tab: SelectedTab,
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
-    current_account: Option<AppAccount>,
-    my_pull_requests: Option<AppPaginatedPullRequests>,
+    current_account: ResourceState<AppAccount>,
+    my_pull_requests: ResourceState<AppPaginatedPullRequests>,
     bitbucket_client: BitbucketClient,
 }
 
@@ -39,8 +39,8 @@ impl App {
             selected_tab: SelectedTab::default(),
             repo_path,
             bitbucket_repo,
-            current_account: None,
-            my_pull_requests: None,
+            current_account: ResourceState::Loading,
+            my_pull_requests: ResourceState::Loading,
             bitbucket_client: BitbucketClient::from_env()?,
         })
     }
@@ -61,13 +61,17 @@ impl App {
 
         self.is_running = true;
         while self.is_running {
-            self.current_account = self
-                .current_account
-                .or_else(|| account_connected_fetcher.try_get());
+            if let ResourceState::Loading = self.current_account
+                && let Some(account) = account_connected_fetcher.try_get()
+            {
+                self.current_account = ResourceState::Loaded(account);
+            }
 
-            self.my_pull_requests = self
-                .my_pull_requests
-                .or_else(|| my_pull_requests_fetcher.try_get());
+            if let ResourceState::Loading = self.my_pull_requests
+                && let Some(pull_requests) = my_pull_requests_fetcher.try_get()
+            {
+                self.my_pull_requests = ResourceState::Loaded(pull_requests);
+            }
 
             tokio::select! {
                 _ = interval.tick() => {terminal.draw(|frame| self.draw(frame))?;},
@@ -100,7 +104,7 @@ impl App {
             SelectedTab::MyPullRequests => {
                 frame.render_widget(
                     MyPullRequestsTabWidget {
-                        pull_requests: &self.my_pull_requests,
+                        pull_requests: self.my_pull_requests.get(),
                     },
                     main_area,
                 );
@@ -114,7 +118,7 @@ impl App {
         let app_title_char_count = app_title_text.chars().count() as u16;
 
         let account_connected_widget = AccountConnectedWidget {
-            current_account: &self.current_account,
+            current_account: self.current_account.get(),
         };
 
         let [app_title, user_name, repo_slug] = Layout::horizontal([
@@ -215,10 +219,25 @@ impl<T> Fetcher<T> {
     }
 }
 
+enum ResourceState<T> {
+    Loading,
+    Loaded(T),
+    Failed,
+}
+
+impl<T> ResourceState<T> {
+    fn get(&self) -> Option<&T> {
+        match self {
+            ResourceState::Loaded(data) => Some(data),
+            _ => None,
+        }
+    }
+}
+
 const LOADING_TEXT: &str = "...";
 
 struct MyPullRequestsTabWidget<'a> {
-    pull_requests: &'a Option<AppPaginatedPullRequests>,
+    pull_requests: Option<&'a AppPaginatedPullRequests>,
 }
 
 impl Widget for MyPullRequestsTabWidget<'_> {
@@ -270,7 +289,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
 }
 
 struct AccountConnectedWidget<'a> {
-    current_account: &'a Option<AppAccount>,
+    current_account: Option<&'a AppAccount>,
 }
 
 impl AccountConnectedWidget<'_> {

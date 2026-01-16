@@ -13,7 +13,11 @@ async fn main() -> Result<(), anyhow::Error> {
     let repo_path = env::args().nth(1);
 
     let terminal = ratatui::init();
-    let result = App::new(repo_path)?.run(terminal).await;
+    let result = match App::new(repo_path) {
+        Ok(app) => app.run(terminal).await,
+        Err(e) => Err(e),
+    };
+
     ratatui::restore();
 
     result

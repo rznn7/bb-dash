@@ -713,7 +713,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &c
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_query_state {
-        req_builder = req_builder.query(&[("state", &serde_json::to_string(param_value)?)]);
+        req_builder = req_builder.query(&[("state", &param_value.to_string())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
@@ -2174,7 +2174,7 @@ pub async fn workspaces_workspace_pullrequests_selected_user_get(configuration: 
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_query_state {
-        req_builder = req_builder.query(&[("state", &serde_json::to_string(param_value)?)]);
+        req_builder = req_builder.query(&[("state", &param_value.to_string())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());

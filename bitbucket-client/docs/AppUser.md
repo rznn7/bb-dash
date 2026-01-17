@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | **String** |  | 
-**links** | Option<[**models::AccountLinks**](account_links.md)> |  | [optional]
+**links** | Option<[**models::AccountLinks**](AccountLinks.md)> |  | [optional]
 **created_on** | Option<**String**> |  | [optional]
 **display_name** | Option<**String**> |  | [optional]
 **uuid** | Option<**String**> |  | [optional]

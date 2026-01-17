@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | **String** |  | 
-**links** | Option<[**serde_json::Value**](.md)> |  | [optional]
+**links** | Option<**serde_json::Value**> |  | [optional]
 **name** | Option<**String**> |  | [optional]
 **id** | Option<**i32**> |  | [optional]
 

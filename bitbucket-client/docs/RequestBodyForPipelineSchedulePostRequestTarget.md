@@ -4,9 +4,9 @@
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**selector** | [**models::PipelineSelector**](pipeline_selector.md) |  | 
+**selector** | [**models::PipelineSelector**](PipelineSelector.md) |  | 
 **ref_name** | **String** | The name of the reference. | 
-**ref_type** | **String** | The type of reference (branch only). | 
+**ref_type** | **RefType** | The type of reference (branch only). (enum: branch) | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

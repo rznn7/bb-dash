@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | Option<**String**> |  | [optional]
-**status** | Option<**String**> | The status of the import/export job | [optional]
+**status** | Option<**Status**> | The status of the import/export job (enum: ACCEPTED, STARTED, RUNNING, FAILURE) | [optional]
 **phase** | Option<**String**> | The phase of the import/export job | [optional]
 **total** | Option<**i32**> | The total number of issues being imported/exported | [optional]
 **count** | Option<**i32**> | The total number of issues already imported/exported | [optional]

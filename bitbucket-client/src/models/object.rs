@@ -324,6 +324,12 @@ pub enum Object {
     #[serde(rename="workspace")]
     Workspace {
     },
+    #[serde(rename="workspace_access")]
+    WorkspaceAccess {
+    },
+    #[serde(rename="workspace_base")]
+    WorkspaceBase {
+    },
     #[serde(rename="workspace_membership")]
     WorkspaceMembership {
     },

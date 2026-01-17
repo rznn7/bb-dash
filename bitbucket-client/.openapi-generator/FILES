@@ -99,6 +99,7 @@ docs/PaginatedTasks.md
 docs/PaginatedTreeentries.md
 docs/PaginatedVersions.md
 docs/PaginatedWebhookSubscriptions.md
+docs/PaginatedWorkspaceAccess.md
 docs/PaginatedWorkspaceMemberships.md
 docs/PaginatedWorkspaces.md
 docs/Participant.md
@@ -203,6 +204,8 @@ docs/UsersApi.md
 docs/Version.md
 docs/WebhookSubscription.md
 docs/Workspace.md
+docs/WorkspaceAccess.md
+docs/WorkspaceBase.md
 docs/WorkspaceMembership.md
 src/apis/configuration.rs
 src/apis/mod.rs
@@ -310,6 +313,7 @@ src/models/paginated_tasks.rs
 src/models/paginated_treeentries.rs
 src/models/paginated_versions.rs
 src/models/paginated_webhook_subscriptions.rs
+src/models/paginated_workspace_access.rs
 src/models/paginated_workspace_memberships.rs
 src/models/paginated_workspaces.rs
 src/models/participant.rs
@@ -411,4 +415,6 @@ src/models/user_links.rs
 src/models/version.rs
 src/models/webhook_subscription.rs
 src/models/workspace.rs
+src/models/workspace_access.rs
+src/models/workspace_base.rs
 src/models/workspace_membership.rs

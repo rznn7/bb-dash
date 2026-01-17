@@ -5,10 +5,10 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | **String** |  | 
-**permission** | Option<**String**> |  | [optional]
-**user** | Option<[**models::User**](user.md)> |  | [optional]
-**repository** | Option<[**models::Repository**](repository.md)> |  | [optional]
-**links** | Option<[**serde_json::Value**](.md)> |  | [optional]
+**permission** | Option<**Permission**> |  (enum: read, write, admin, none) | [optional]
+**user** | Option<[**models::User**](User.md)> |  | [optional]
+**repository** | Option<[**models::Repository**](Repository.md)> |  | [optional]
+**links** | Option<**serde_json::Value**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -8,13 +8,13 @@ Name | Type | Description | Notes
 **id** | Option<**i64**> |  | [optional]
 **created_on** | Option<**String**> |  | [optional]
 **updated_on** | Option<**String**> |  | [optional]
-**content** | Option<[**serde_json::Value**](.md)> |  | [optional]
-**user** | Option<[**models::Account**](account.md)> |  | [optional]
+**content** | Option<**serde_json::Value**> |  | [optional]
+**user** | Option<[**models::Account**](Account.md)> |  | [optional]
 **deleted** | Option<**bool**> |  | [optional]
-**parent** | Option<[**models::Comment**](comment.md)> |  | [optional]
-**inline** | Option<[**serde_json::Value**](.md)> |  | [optional]
-**links** | Option<[**serde_json::Value**](.md)> |  | [optional]
-**issue** | Option<[**models::Issue**](issue.md)> |  | [optional]
+**parent** | Option<[**models::Comment**](Comment.md)> |  | [optional]
+**inline** | Option<**serde_json::Value**> |  | [optional]
+**links** | Option<**serde_json::Value**> |  | [optional]
+**issue** | Option<[**models::Issue**](Issue.md)> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

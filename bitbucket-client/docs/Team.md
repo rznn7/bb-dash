@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | **String** |  | 
-**links** | Option<[**models::TeamLinks**](team_links.md)> |  | [optional]
+**links** | Option<[**models::TeamLinks**](TeamLinks.md)> |  | [optional]
 **created_on** | Option<**String**> |  | [optional]
 **display_name** | Option<**String**> |  | [optional]
 **uuid** | Option<**String**> |  | [optional]

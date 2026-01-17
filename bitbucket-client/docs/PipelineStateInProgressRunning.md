@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | **String** |  | 
-**name** | Option<**String**> | The name of the stage (RUNNING) | [optional]
+**name** | Option<**Name**> | The name of the stage (RUNNING) (enum: RUNNING) | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

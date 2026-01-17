@@ -13,9 +13,9 @@ Name | Type | Description | Notes
 **link** | Option<**String**> | A URL linking to the results of the report in an external tool. | [optional]
 **remote_link_enabled** | Option<**bool**> | If enabled, a remote link is created in Jira for the work item associated with the commit the report belongs to. | [optional]
 **logo_url** | Option<**String**> | A URL to the report logo. If none is provided, the default insights logo will be used. | [optional]
-**report_type** | Option<**String**> | The type of the report. | [optional]
-**result** | Option<**String**> | The state of the report. May be set to PENDING and later updated. | [optional]
-**data** | Option<[**Vec<models::ReportData>**](report_data.md)> | An array of data fields to display information on the report. Maximum 10. | [optional]
+**report_type** | Option<**ReportType**> | The type of the report. (enum: SECURITY, COVERAGE, TEST, BUG) | [optional]
+**result** | Option<**Result**> | The state of the report. May be set to PENDING and later updated. (enum: PASSED, FAILED, PENDING) | [optional]
+**data** | Option<[**Vec<models::ReportData>**](ReportData.md)> | An array of data fields to display information on the report. Maximum 10. | [optional]
 **created_on** | Option<**String**> | The timestamp when the report was created. | [optional]
 **updated_on** | Option<**String**> | The timestamp when the report was updated. | [optional]
 

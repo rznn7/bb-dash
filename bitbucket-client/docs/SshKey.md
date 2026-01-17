@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **label** | Option<**String**> | The user-defined label for the SSH key | [optional]
 **created_on** | Option<**String**> |  | [optional]
 **last_used** | Option<**String**> |  | [optional]
-**links** | Option<[**serde_json::Value**](.md)> |  | [optional]
+**links** | Option<**serde_json::Value**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

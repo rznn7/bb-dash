@@ -11,8 +11,8 @@ Name | Type | Description | Notes
 **label** | Option<**String**> | The user-defined label for the SSH key | [optional]
 **created_on** | Option<**String**> |  | [optional]
 **last_used** | Option<**String**> |  | [optional]
-**links** | Option<[**serde_json::Value**](.md)> |  | [optional]
-**owner** | Option<[**models::Account**](account.md)> |  | [optional]
+**links** | Option<**serde_json::Value**> |  | [optional]
+**owner** | Option<[**models::Account**](Account.md)> |  | [optional]
 **expires_on** | Option<**String**> |  | [optional]
 **fingerprint** | Option<**String**> | The SSH key fingerprint in SHA-256 format. | [optional]
 

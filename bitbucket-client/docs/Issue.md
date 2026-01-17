@@ -5,23 +5,23 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **r#type** | **String** |  | 
-**links** | Option<[**serde_json::Value**](.md)> |  | [optional]
+**links** | Option<**serde_json::Value**> |  | [optional]
 **id** | Option<**i32**> |  | [optional]
-**repository** | Option<[**models::Repository**](repository.md)> |  | [optional]
+**repository** | Option<[**models::Repository**](Repository.md)> |  | [optional]
 **title** | Option<**String**> |  | [optional]
-**reporter** | Option<[**models::Account**](account.md)> |  | [optional]
-**assignee** | Option<[**models::Account**](account.md)> |  | [optional]
+**reporter** | Option<[**models::Account**](Account.md)> |  | [optional]
+**assignee** | Option<[**models::Account**](Account.md)> |  | [optional]
 **created_on** | Option<**String**> |  | [optional]
 **updated_on** | Option<**String**> |  | [optional]
 **edited_on** | Option<**String**> |  | [optional]
-**state** | Option<**String**> |  | [optional]
-**kind** | Option<**String**> |  | [optional]
-**priority** | Option<**String**> |  | [optional]
-**milestone** | Option<[**models::Milestone**](milestone.md)> |  | [optional]
-**version** | Option<[**models::Version**](version.md)> |  | [optional]
-**component** | Option<[**models::Component**](component.md)> |  | [optional]
+**state** | Option<**State**> |  (enum: submitted, new, open, resolved, on hold, invalid, duplicate, wontfix, closed) | [optional]
+**kind** | Option<**Kind**> |  (enum: bug, enhancement, proposal, task) | [optional]
+**priority** | Option<**Priority**> |  (enum: trivial, minor, major, critical, blocker) | [optional]
+**milestone** | Option<[**models::Milestone**](Milestone.md)> |  | [optional]
+**version** | Option<[**models::Version**](Version.md)> |  | [optional]
+**component** | Option<[**models::Component**](Component.md)> |  | [optional]
 **votes** | Option<**i32**> |  | [optional]
-**content** | Option<[**serde_json::Value**](.md)> |  | [optional]
+**content** | Option<**serde_json::Value**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

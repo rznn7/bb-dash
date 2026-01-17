@@ -5,7 +5,6 @@ use tracing::info;
 use crate::{logging::initialize_logging, tui::App};
 use std::env;
 
-mod bitbucket_api;
 mod bitbucket_client;
 mod bitbucket_repo;
 mod logging;

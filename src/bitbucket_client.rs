@@ -1,14 +1,15 @@
-use bitbucket_client::apis::{configuration::Configuration, users_api::user_get};
+use bitbucket_client::apis::{
+    configuration::Configuration,
+    pullrequests_api::repositories_workspace_repo_slug_pullrequests_get, users_api::user_get,
+};
 
 use crate::{
-    bitbucket_api::{AppBitbucketApi, PaginatedPullRequests},
     bitbucket_repo::BitbucketRepo,
-    models::Account,
+    models::{Account, PaginatedPullRequests},
 };
 
 #[derive(Clone, Debug)]
 pub struct BitbucketClient {
-    bitbucket_api: AppBitbucketApi,
     configuration: Configuration,
 }
 
@@ -16,18 +17,13 @@ impl BitbucketClient {
     pub fn from_env() -> Result<Self, std::env::VarError> {
         dotenv::dotenv().ok();
 
-        let base_url = std::env::var("BITBUCKET_BASE_URL")?;
-        let api_token = std::env::var("BITBUCKET_API_TOKEN")?;
         let username = std::env::var("BITBUCKET_USERNAME")?;
+        let api_token = std::env::var("BITBUCKET_API_TOKEN")?;
 
-        let bitbucket_api = AppBitbucketApi::new(base_url, api_token.clone(), username.clone());
         let mut configuration = Configuration::new();
         configuration.basic_auth = Some((username, Some(api_token)));
 
-        Ok(BitbucketClient {
-            bitbucket_api,
-            configuration,
-        })
+        Ok(BitbucketClient { configuration })
     }
 
     pub async fn get_user(&self) -> Result<Account, anyhow::Error> {
@@ -38,13 +34,19 @@ impl BitbucketClient {
     pub async fn list_pull_requests(
         &self,
         bitbucket_repo: &BitbucketRepo,
+        state: Option<&str>,
     ) -> Result<PaginatedPullRequests, anyhow::Error> {
         let workspace = bitbucket_repo.workspace();
         let repo_slug = bitbucket_repo.slug();
-        let pull_requests = self
-            .bitbucket_api
-            .list_pull_requests(workspace, repo_slug)
-            .await?;
+        let pull_requests = repositories_workspace_repo_slug_pullrequests_get(
+            &self.configuration,
+            repo_slug,
+            workspace,
+            state,
+        )
+        .await?
+        .into();
+
         Ok(pull_requests)
     }
 }

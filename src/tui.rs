@@ -1,6 +1,7 @@
 use crate::{
-    bitbucket_api::PaginatedPullRequests, bitbucket_client::BitbucketClient,
-    bitbucket_repo::BitbucketRepo, models::Account,
+    bitbucket_client::BitbucketClient,
+    bitbucket_repo::BitbucketRepo,
+    models::{Account, PaginatedPullRequests},
 };
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -55,7 +56,7 @@ impl App {
         let mut my_pull_requests_fetcher = {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
-            Fetcher::new(async move { client.list_pull_requests(&repo).await })
+            Fetcher::new(async move { client.list_pull_requests(&repo, None).await })
         };
 
         self.is_running = true;
@@ -249,12 +250,26 @@ impl Widget for MyPullRequestsTabWidget<'_> {
             let mut max_length_destination_branch = 0;
             let mut rows = Vec::new();
 
-            for pr in &pull_requests.values {
-                let id = pr.id.to_string();
-                let state = pr.state.to_string();
-                let title = pr.title.clone();
-                let source_branch = pr.source.branch.name.clone();
-                let destination_branch = pr.destination.branch.name.clone();
+            for pr in pull_requests.values.as_deref().unwrap_or(&[]) {
+                let id = pr.id.map_or(String::from("?"), |id| id.to_string());
+                let state = pr
+                    .state
+                    .as_ref()
+                    .map_or(String::from("?"), |state| state.to_string());
+                let title = pr
+                    .title
+                    .as_ref()
+                    .map_or(String::from("?"), |title| title.clone());
+                let source_branch = pr
+                    .source
+                    .as_ref()
+                    .and_then(|s| s.branch.as_ref())
+                    .map_or(String::from("?"), |b| b.name.clone());
+                let destination_branch = pr
+                    .destination
+                    .as_ref()
+                    .and_then(|d| d.branch.as_ref())
+                    .map_or(String::from("?"), |b| b.name.clone());
 
                 max_length_id = max_length_id.max(id.chars().count());
                 max_length_state = max_length_state.max(state.chars().count());

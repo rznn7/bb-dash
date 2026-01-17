@@ -19,7 +19,7 @@ use super::{Error, configuration, ContentType};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum UserEmailsEmailGetError {
-    DefaultResponse(models::Error),
+    DefaultResponse(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -27,7 +27,7 @@ pub enum UserEmailsEmailGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum UserEmailsGetError {
-    DefaultResponse(models::Error),
+    DefaultResponse(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -35,7 +35,7 @@ pub enum UserEmailsGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum UserGetError {
-    Status401(models::Error),
+    Status401(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -43,13 +43,13 @@ pub enum UserGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum UsersSelectedUserGetError {
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
 
 /// Returns details about a specific one of the authenticated user's email addresses.  Details describe whether the address has been confirmed by the user and whether it is the user's primary address or not.
-pub async fn user_emails_email_get(configuration: &configuration::Configuration, email: &str) -> Result<models::Error, Error<UserEmailsEmailGetError>> {
+pub async fn user_emails_email_get(configuration: &configuration::Configuration, email: &str) -> Result<models::ApiError, Error<UserEmailsEmailGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_email = email;
 
@@ -89,8 +89,8 @@ pub async fn user_emails_email_get(configuration: &configuration::Configuration,
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Error`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Error`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiError`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiError`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -100,7 +100,7 @@ pub async fn user_emails_email_get(configuration: &configuration::Configuration,
 }
 
 /// Returns all the authenticated user's email addresses. Both confirmed and unconfirmed.
-pub async fn user_emails_get(configuration: &configuration::Configuration, ) -> Result<models::Error, Error<UserEmailsGetError>> {
+pub async fn user_emails_get(configuration: &configuration::Configuration, ) -> Result<models::ApiError, Error<UserEmailsGetError>> {
 
     let uri_str = format!("{}/user/emails", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -138,8 +138,8 @@ pub async fn user_emails_get(configuration: &configuration::Configuration, ) -> 
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Error`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Error`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiError`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiError`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -149,7 +149,7 @@ pub async fn user_emails_get(configuration: &configuration::Configuration, ) -> 
 }
 
 /// Returns the currently logged in user.
-pub async fn user_get(configuration: &configuration::Configuration, ) -> Result<models::Account, Error<UserGetError>> {
+pub async fn user_get(configuration: &configuration::Configuration, ) -> Result<models::ApiAccount, Error<UserGetError>> {
 
     let uri_str = format!("{}/user", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -187,8 +187,8 @@ pub async fn user_get(configuration: &configuration::Configuration, ) -> Result<
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Account`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Account`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiAccount`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiAccount`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -198,7 +198,7 @@ pub async fn user_get(configuration: &configuration::Configuration, ) -> Result<
 }
 
 /// Gets the public information associated with a user account.  If the user's profile is private, `location`, `website` and `created_on` elements are omitted.  Note that the user object returned by this operation is changing significantly, due to privacy changes. See the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-bitbucket-user-objects) for details.
-pub async fn users_selected_user_get(configuration: &configuration::Configuration, selected_user: &str) -> Result<models::Account, Error<UsersSelectedUserGetError>> {
+pub async fn users_selected_user_get(configuration: &configuration::Configuration, selected_user: &str) -> Result<models::ApiAccount, Error<UsersSelectedUserGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_selected_user = selected_user;
 
@@ -238,8 +238,8 @@ pub async fn users_selected_user_get(configuration: &configuration::Configuratio
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Account`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Account`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiAccount`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiAccount`")))),
         }
     } else {
         let content = resp.text().await?;

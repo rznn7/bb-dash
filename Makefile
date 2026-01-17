@@ -22,7 +22,8 @@ generate-api:
 		--additional-properties=supportMiddleware=true \
 		--global-property=apis=Users:Pullrequests \
 		--global-property=models \
-		--global-property=supportingFiles
+		--global-property=supportingFiles \
+		--model-name-prefix=Api
 	@echo "✓ Client generated in ./bitbucket-client"
 
 # Build the project

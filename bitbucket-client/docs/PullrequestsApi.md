@@ -46,7 +46,7 @@ Method | HTTP request | Description
 
 ## get_pullrequests_for_commit
 
-> models::PaginatedPullrequests get_pullrequests_for_commit(workspace, repo_slug, commit, page, pagelen)
+> models::ApiPaginatedPullrequests get_pullrequests_for_commit(workspace, repo_slug, commit, page, pagelen)
 List pull requests that contain a commit
 
 Returns a paginated list of all pull requests as part of which this commit was reviewed. Pull Request Commit Links app must be installed first before using this API; installation automatically occurs when 'Go to pull request' is clicked from the web interface for a commit's details.
@@ -64,7 +64,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedPullrequests**](paginated_pullrequests.md)
+[**models::ApiPaginatedPullrequests**](paginated_pullrequests.md)
 
 ### Authorization
 
@@ -80,7 +80,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_default_reviewers_get
 
-> models::PaginatedAccounts repositories_workspace_repo_slug_default_reviewers_get(repo_slug, workspace)
+> models::ApiPaginatedAccounts repositories_workspace_repo_slug_default_reviewers_get(repo_slug, workspace)
 List default reviewers
 
 Returns the repository's default reviewers.  These are the users that are automatically added as reviewers on every new pull request that is created. To obtain the repository's default reviewers as well as the default reviewers inherited from the project, use the [effective-default-reveiwers](#api-repositories-workspace-repo-slug-effective-default-reviewers-get) endpoint.
@@ -95,7 +95,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedAccounts**](paginated_accounts.md)
+[**models::ApiPaginatedAccounts**](paginated_accounts.md)
 
 ### Authorization
 
@@ -143,7 +143,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_default_reviewers_target_username_get
 
-> models::Account repositories_workspace_repo_slug_default_reviewers_target_username_get(repo_slug, target_username, workspace)
+> models::ApiAccount repositories_workspace_repo_slug_default_reviewers_target_username_get(repo_slug, target_username, workspace)
 Get a default reviewer
 
 Returns the specified reviewer.  This can be used to test whether a user is among the repository's default reviewers list. A 404 indicates that that specified user is not a default reviewer.
@@ -159,7 +159,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Account**](account.md)
+[**models::ApiAccount**](account.md)
 
 ### Authorization
 
@@ -175,7 +175,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_default_reviewers_target_username_put
 
-> models::Account repositories_workspace_repo_slug_default_reviewers_target_username_put(repo_slug, target_username, workspace)
+> models::ApiAccount repositories_workspace_repo_slug_default_reviewers_target_username_put(repo_slug, target_username, workspace)
 Add a user to the default reviewers
 
 Adds the specified user to the repository's list of default reviewers.  This method is idempotent. Adding a user a second time has no effect.
@@ -191,7 +191,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Account**](account.md)
+[**models::ApiAccount**](account.md)
 
 ### Authorization
 
@@ -207,7 +207,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_effective_default_reviewers_get
 
-> models::PaginatedDefaultReviewerAndType repositories_workspace_repo_slug_effective_default_reviewers_get(repo_slug, workspace)
+> models::ApiPaginatedDefaultReviewerAndType repositories_workspace_repo_slug_effective_default_reviewers_get(repo_slug, workspace)
 List effective default reviewers
 
 Returns the repository's effective default reviewers. This includes both default reviewers defined at the repository level as well as those inherited from its project.  These are the users that are automatically added as reviewers on every new pull request that is created.
@@ -222,7 +222,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedDefaultReviewerAndType**](paginated_default_reviewer_and_type.md)
+[**models::ApiPaginatedDefaultReviewerAndType**](paginated_default_reviewer_and_type.md)
 
 ### Authorization
 
@@ -269,7 +269,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_get
 
-> models::PaginatedPullrequests repositories_workspace_repo_slug_pullrequests_get(repo_slug, workspace, state)
+> models::ApiPaginatedPullrequests repositories_workspace_repo_slug_pullrequests_get(repo_slug, workspace, state)
 List pull requests
 
 Returns all pull requests on the specified repository.  By default only open pull requests are returned. This can be controlled using the `state` query parameter. To retrieve pull requests that are in one of multiple states, repeat the `state` parameter for each individual state.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
@@ -285,7 +285,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedPullrequests**](paginated_pullrequests.md)
+[**models::ApiPaginatedPullrequests**](paginated_pullrequests.md)
 
 ### Authorization
 
@@ -301,7 +301,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_post
 
-> models::Pullrequest repositories_workspace_repo_slug_pullrequests_post(repo_slug, workspace, _body)
+> models::ApiPullrequest repositories_workspace_repo_slug_pullrequests_post(repo_slug, workspace, _body)
 Create a pull request
 
 Creates a new pull request where the destination repository is this repository and the author is the authenticated user.  The minimum required fields to create a pull request are `title` and `source`, specified by a branch name.  ``` curl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repository/pullrequests \\     -u my-username:my-password \\     --request POST \\     --header 'Content-Type: application/json' \\     --data '{         \"title\": \"My Title\",         \"source\": {             \"branch\": {                 \"name\": \"staging\"             }         }     }' ```  If the pull request's `destination` is not specified, it will default to the `repository.mainbranch`. To open a pull request to a different branch, say from a feature branch to a staging branch, specify a `destination` (same format as the `source`):  ``` {     \"title\": \"My Title\",     \"source\": {         \"branch\": {             \"name\": \"my-feature-branch\"         }     },     \"destination\": {         \"branch\": {             \"name\": \"staging\"         }     } } ```  Reviewers can be specified by adding an array of user objects as the `reviewers` property.  ``` {     \"title\": \"My Title\",     \"source\": {         \"branch\": {             \"name\": \"my-feature-branch\"         }     },     \"reviewers\": [         {             \"uuid\": \"{504c3b62-8120-4f0c-a7bc-87800b9d6f70}\"         }     ] } ```  Other fields:  * `description` - a string * `close_source_branch` - boolean that specifies if the source branch should be closed upon merging * `draft` - boolean that specifies whether the pull request is a draft
@@ -313,11 +313,11 @@ Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
-**_body** | Option<[**Pullrequest**](Pullrequest.md)> | The new pull request.  The request URL you POST to becomes the destination repository URL. For this reason, you must specify an explicit source repository in the request object if you want to pull from a different repository (fork).  Since not all elements are required or even mutable, you only need to include the elements you want to initialize, such as the source branch and the title. |  |
+**_body** | Option<[**ApiPullrequest**](ApiPullrequest.md)> | The new pull request.  The request URL you POST to becomes the destination repository URL. For this reason, you must specify an explicit source repository in the request object if you want to pull from a different repository (fork).  Since not all elements are required or even mutable, you only need to include the elements you want to initialize, such as the source branch and the title. |  |
 
 ### Return type
 
-[**models::Pullrequest**](pullrequest.md)
+[**models::ApiPullrequest**](pullrequest.md)
 
 ### Authorization
 
@@ -397,7 +397,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_approve_post
 
-> models::Participant repositories_workspace_repo_slug_pullrequests_pull_request_id_approve_post(pull_request_id, repo_slug, workspace)
+> models::ApiParticipant repositories_workspace_repo_slug_pullrequests_pull_request_id_approve_post(pull_request_id, repo_slug, workspace)
 Approve a pull request
 
 Approve the specified pull request as the authenticated user.
@@ -413,7 +413,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Participant**](participant.md)
+[**models::ApiParticipant**](participant.md)
 
 ### Authorization
 
@@ -462,7 +462,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_get
 
-> models::PullrequestComment repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_get(comment_id, pull_request_id, repo_slug, workspace)
+> models::ApiPullrequestComment repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_get(comment_id, pull_request_id, repo_slug, workspace)
 Get a comment on a pull request
 
 Returns a specific pull request comment.
@@ -479,7 +479,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PullrequestComment**](pullrequest_comment.md)
+[**models::ApiPullrequestComment**](pullrequest_comment.md)
 
 ### Authorization
 
@@ -495,7 +495,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_put
 
-> models::PullrequestComment repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_put(comment_id, pull_request_id, repo_slug, workspace, _body)
+> models::ApiPullrequestComment repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_put(comment_id, pull_request_id, repo_slug, workspace, _body)
 Update a comment on a pull request
 
 Updates a specific pull request comment.
@@ -509,11 +509,11 @@ Name | Type | Description  | Required | Notes
 **pull_request_id** | **i32** | The id of the pull request. | [required] |
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
-**_body** | [**PullrequestComment**](PullrequestComment.md) | The contents of the updated comment. | [required] |
+**_body** | [**ApiPullrequestComment**](ApiPullrequestComment.md) | The contents of the updated comment. | [required] |
 
 ### Return type
 
-[**models::PullrequestComment**](pullrequest_comment.md)
+[**models::ApiPullrequestComment**](pullrequest_comment.md)
 
 ### Authorization
 
@@ -560,7 +560,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_resolve_post
 
-> models::CommentResolution repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_resolve_post(comment_id, pull_request_id, repo_slug, workspace)
+> models::ApiCommentResolution repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_resolve_post(comment_id, pull_request_id, repo_slug, workspace)
 Resolve a comment thread
 
 ### Parameters
@@ -575,7 +575,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::CommentResolution**](comment_resolution.md)
+[**models::ApiCommentResolution**](comment_resolution.md)
 
 ### Authorization
 
@@ -591,7 +591,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_get
 
-> models::PaginatedPullrequestComments repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_get(pull_request_id, repo_slug, workspace)
+> models::ApiPaginatedPullrequestComments repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_get(pull_request_id, repo_slug, workspace)
 List comments on a pull request
 
 Returns a paginated list of the pull request's comments.  This includes both global, inline comments and replies.  The default sorting is oldest to newest and can be overridden with the `sort` query parameter.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
@@ -607,7 +607,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedPullrequestComments**](paginated_pullrequest_comments.md)
+[**models::ApiPaginatedPullrequestComments**](paginated_pullrequest_comments.md)
 
 ### Authorization
 
@@ -623,7 +623,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_post
 
-> models::PullrequestComment repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_post(pull_request_id, repo_slug, workspace, _body)
+> models::ApiPullrequestComment repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_post(pull_request_id, repo_slug, workspace, _body)
 Create a comment on a pull request
 
 Creates a new pull request comment.  Returns the newly created pull request comment.
@@ -636,11 +636,11 @@ Name | Type | Description  | Required | Notes
 **pull_request_id** | **i32** | The id of the pull request. | [required] |
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
-**_body** | [**PullrequestComment**](PullrequestComment.md) | The comment object. | [required] |
+**_body** | [**ApiPullrequestComment**](ApiPullrequestComment.md) | The comment object. | [required] |
 
 ### Return type
 
-[**models::PullrequestComment**](pullrequest_comment.md)
+[**models::ApiPullrequestComment**](pullrequest_comment.md)
 
 ### Authorization
 
@@ -688,7 +688,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_decline_post
 
-> models::Pullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_decline_post(pull_request_id, repo_slug, workspace)
+> models::ApiPullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_decline_post(pull_request_id, repo_slug, workspace)
 Decline a pull request
 
 Declines the pull request.
@@ -704,7 +704,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Pullrequest**](pullrequest.md)
+[**models::ApiPullrequest**](pullrequest.md)
 
 ### Authorization
 
@@ -784,7 +784,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_get
 
-> models::Pullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_get(pull_request_id, repo_slug, workspace)
+> models::ApiPullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_get(pull_request_id, repo_slug, workspace)
 Get a pull request
 
 Returns the specified pull request.
@@ -800,7 +800,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Pullrequest**](pullrequest.md)
+[**models::ApiPullrequest**](pullrequest.md)
 
 ### Authorization
 
@@ -816,7 +816,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_merge_post
 
-> models::Pullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_merge_post(pull_request_id, repo_slug, workspace, r#async, _body)
+> models::ApiPullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_merge_post(pull_request_id, repo_slug, workspace, r#async, _body)
 Merge a pull request
 
 Merges the pull request.
@@ -830,11 +830,11 @@ Name | Type | Description  | Required | Notes
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
 **r#async** | Option<**bool**> | Default value is false.   When set to true, runs merge asynchronously and immediately returns a 202 with polling link to the task-status API in the Location header.   When set to false, runs merge and waits for it to complete, returning 200 when it succeeds. If the duration of the merge exceeds a timeout threshold, the API returns a 202 with polling link to the task-status API in the Location header. |  |
-**_body** | Option<[**PullrequestMergeParameters**](PullrequestMergeParameters.md)> |  |  |
+**_body** | Option<[**ApiPullrequestMergeParameters**](ApiPullrequestMergeParameters.md)> |  |  |
 
 ### Return type
 
-[**models::Pullrequest**](pullrequest.md)
+[**models::ApiPullrequest**](pullrequest.md)
 
 ### Authorization
 
@@ -915,7 +915,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_put
 
-> models::Pullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_put(pull_request_id, repo_slug, workspace, _body)
+> models::ApiPullrequest repositories_workspace_repo_slug_pullrequests_pull_request_id_put(pull_request_id, repo_slug, workspace, _body)
 Update a pull request
 
 Mutates the specified pull request.  This can be used to change the pull request's branches or description.  Only open pull requests can be mutated.
@@ -928,11 +928,11 @@ Name | Type | Description  | Required | Notes
 **pull_request_id** | **i32** | The id of the pull request. | [required] |
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
-**_body** | Option<[**Pullrequest**](Pullrequest.md)> | The pull request that is to be updated. |  |
+**_body** | Option<[**ApiPullrequest**](ApiPullrequest.md)> | The pull request that is to be updated. |  |
 
 ### Return type
 
-[**models::Pullrequest**](pullrequest.md)
+[**models::ApiPullrequest**](pullrequest.md)
 
 ### Authorization
 
@@ -978,7 +978,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_request_changes_post
 
-> models::Participant repositories_workspace_repo_slug_pullrequests_pull_request_id_request_changes_post(pull_request_id, repo_slug, workspace)
+> models::ApiParticipant repositories_workspace_repo_slug_pullrequests_pull_request_id_request_changes_post(pull_request_id, repo_slug, workspace)
 Request changes for a pull request
 
 ### Parameters
@@ -992,7 +992,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Participant**](participant.md)
+[**models::ApiParticipant**](participant.md)
 
 ### Authorization
 
@@ -1008,7 +1008,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get
 
-> models::PaginatedCommitstatuses repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get(pull_request_id, repo_slug, workspace, q, sort)
+> models::ApiPaginatedCommitstatuses repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get(pull_request_id, repo_slug, workspace, q, sort)
 List commit statuses for a pull request
 
 Returns all statuses (e.g. build results) for the given pull request.
@@ -1026,7 +1026,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedCommitstatuses**](paginated_commitstatuses.md)
+[**models::ApiPaginatedCommitstatuses**](paginated_commitstatuses.md)
 
 ### Authorization
 
@@ -1042,7 +1042,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_get
 
-> models::PaginatedTasks repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_get(pull_request_id, repo_slug, workspace, q, sort, pagelen)
+> models::ApiPaginatedTasks repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_get(pull_request_id, repo_slug, workspace, q, sort, pagelen)
 List tasks on a pull request
 
 Returns a paginated list of the pull request's tasks.  This endpoint supports filtering and sorting of the results by the 'task' field. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
@@ -1061,7 +1061,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedTasks**](paginated_tasks.md)
+[**models::ApiPaginatedTasks**](paginated_tasks.md)
 
 ### Authorization
 
@@ -1077,7 +1077,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_post
 
-> models::PullrequestCommentTask repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_post(pull_request_id, repo_slug, workspace, _body)
+> models::ApiPullrequestCommentTask repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_post(pull_request_id, repo_slug, workspace, _body)
 Create a task on a pull request
 
 Creates a new pull request task.  Returns the newly created pull request task.  Tasks can optionally be created in relation to a comment specified by the comment's ID which will cause the task to appear below the comment on a pull request when viewed in Bitbucket.
@@ -1090,11 +1090,11 @@ Name | Type | Description  | Required | Notes
 **pull_request_id** | **i32** | The id of the pull request. | [required] |
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
-**_body** | [**PullrequestTaskCreate**](PullrequestTaskCreate.md) | The contents of the task | [required] |
+**_body** | [**ApiPullrequestTaskCreate**](ApiPullrequestTaskCreate.md) | The contents of the task | [required] |
 
 ### Return type
 
-[**models::PullrequestCommentTask**](pullrequest_comment_task.md)
+[**models::ApiPullrequestCommentTask**](pullrequest_comment_task.md)
 
 ### Authorization
 
@@ -1143,7 +1143,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_get
 
-> models::PullrequestCommentTask repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_get(pull_request_id, repo_slug, task_id, workspace)
+> models::ApiPullrequestCommentTask repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_get(pull_request_id, repo_slug, task_id, workspace)
 Get a task on a pull request
 
 Returns a specific pull request task.
@@ -1160,7 +1160,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PullrequestCommentTask**](pullrequest_comment_task.md)
+[**models::ApiPullrequestCommentTask**](pullrequest_comment_task.md)
 
 ### Authorization
 
@@ -1176,7 +1176,7 @@ Name | Type | Description  | Required | Notes
 
 ## repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_put
 
-> models::PullrequestCommentTask repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_put(pull_request_id, repo_slug, task_id, workspace, _body)
+> models::ApiPullrequestCommentTask repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_put(pull_request_id, repo_slug, task_id, workspace, _body)
 Update a task on a pull request
 
 Updates a specific pull request task.
@@ -1190,11 +1190,11 @@ Name | Type | Description  | Required | Notes
 **repo_slug** | **String** | This can either be the repository slug or the UUID of the repository, surrounded by curly-braces, for example: `{repository UUID}`.  | [required] |
 **task_id** | **i64** | The ID of the task. | [required] |
 **workspace** | **String** | This can either be the workspace ID (slug) or the workspace UUID surrounded by curly-braces, for example: `{workspace UUID}`.  | [required] |
-**_body** | [**PullrequestTaskUpdate**](PullrequestTaskUpdate.md) | The updated state and content of the task. | [required] |
+**_body** | [**ApiPullrequestTaskUpdate**](ApiPullrequestTaskUpdate.md) | The updated state and content of the task. | [required] |
 
 ### Return type
 
-[**models::PullrequestCommentTask**](pullrequest_comment_task.md)
+[**models::ApiPullrequestCommentTask**](pullrequest_comment_task.md)
 
 ### Authorization
 
@@ -1210,7 +1210,7 @@ Name | Type | Description  | Required | Notes
 
 ## workspaces_workspace_pullrequests_selected_user_get
 
-> models::PaginatedPullrequests workspaces_workspace_pullrequests_selected_user_get(selected_user, workspace, state)
+> models::ApiPaginatedPullrequests workspaces_workspace_pullrequests_selected_user_get(selected_user, workspace, state)
 List workspace pull requests for a user
 
 Returns all workspace pull requests authored by the specified user.  By default only open pull requests are returned. This can be controlled using the `state` query parameter. To retrieve pull requests that are in one of multiple states, repeat the `state` parameter for each individual state.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
@@ -1226,7 +1226,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::PaginatedPullrequests**](paginated_pullrequests.md)
+[**models::ApiPaginatedPullrequests**](paginated_pullrequests.md)
 
 ### Authorization
 

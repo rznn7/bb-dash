@@ -13,7 +13,7 @@ Method | HTTP request | Description
 
 ## user_emails_email_get
 
-> models::Error user_emails_email_get(email)
+> models::ApiError user_emails_email_get(email)
 Get an email address for current user
 
 Returns details about a specific one of the authenticated user's email addresses.  Details describe whether the address has been confirmed by the user and whether it is the user's primary address or not.
@@ -27,7 +27,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Error**](error.md)
+[**models::ApiError**](error.md)
 
 ### Authorization
 
@@ -43,7 +43,7 @@ Name | Type | Description  | Required | Notes
 
 ## user_emails_get
 
-> models::Error user_emails_get()
+> models::ApiError user_emails_get()
 List email addresses for current user
 
 Returns all the authenticated user's email addresses. Both confirmed and unconfirmed.
@@ -54,7 +54,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**models::Error**](error.md)
+[**models::ApiError**](error.md)
 
 ### Authorization
 
@@ -70,7 +70,7 @@ This endpoint does not need any parameter.
 
 ## user_get
 
-> models::Account user_get()
+> models::ApiAccount user_get()
 Get current user
 
 Returns the currently logged in user.
@@ -81,7 +81,7 @@ This endpoint does not need any parameter.
 
 ### Return type
 
-[**models::Account**](account.md)
+[**models::ApiAccount**](account.md)
 
 ### Authorization
 
@@ -97,7 +97,7 @@ This endpoint does not need any parameter.
 
 ## users_selected_user_get
 
-> models::Account users_selected_user_get(selected_user)
+> models::ApiAccount users_selected_user_get(selected_user)
 Get a user
 
 Gets the public information associated with a user account.  If the user's profile is private, `location`, `website` and `created_on` elements are omitted.  Note that the user object returned by this operation is changing significantly, due to privacy changes. See the [announcement](https://developer.atlassian.com/cloud/bitbucket/bitbucket-api-changes-gdpr/#changes-to-bitbucket-user-objects) for details.
@@ -111,7 +111,7 @@ Name | Type | Description  | Required | Notes
 
 ### Return type
 
-[**models::Account**](account.md)
+[**models::ApiAccount**](account.md)
 
 ### Authorization
 

@@ -19,7 +19,7 @@ use super::{Error, configuration, ContentType};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum GetPullrequestsForCommitError {
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -27,7 +27,7 @@ pub enum GetPullrequestsForCommitError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersGetError {
-    Status403(models::Error),
+    Status403(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -35,8 +35,8 @@ pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernameDeleteError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -44,8 +44,8 @@ pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernameDeleteError 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernameGetError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -53,9 +53,9 @@ pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernameGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernamePutError {
-    Status400(models::Error),
-    Status403(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -63,7 +63,7 @@ pub enum RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernamePutError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugEffectiveDefaultReviewersGetError {
-    Status403(models::Error),
+    Status403(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -72,7 +72,7 @@ pub enum RepositoriesWorkspaceRepoSlugEffectiveDefaultReviewersGetError {
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsActivityGetError {
     Status401(),
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -81,7 +81,7 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsActivityGetError {
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsGetError {
     Status401(),
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -89,8 +89,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPostError {
-    Status400(models::Error),
-    Status401(models::Error),
+    Status400(models::ApiError),
+    Status401(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -99,7 +99,7 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPostError {
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdActivityGetError {
     Status401(),
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -107,9 +107,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdActivityGetError 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdApproveDeleteError {
-    Status400(models::Error),
-    Status401(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status401(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -117,8 +117,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdApproveDeleteErro
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdApprovePostError {
-    Status401(models::Error),
-    Status404(models::Error),
+    Status401(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -126,8 +126,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdApprovePostError 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdDeleteError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -135,8 +135,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentId
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdGetError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -144,8 +144,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentId
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdPutError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -153,8 +153,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentId
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdResolveDeleteError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -162,9 +162,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentId
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdResolvePostError {
-    Status403(models::Error),
-    Status404(models::Error),
-    Status409(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
+    Status409(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -172,8 +172,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentId
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsGetError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -181,8 +181,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsGetError 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsPostError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -190,8 +190,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsPostError
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommitsGetError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -199,7 +199,7 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommitsGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdDeclinePostError {
-    Status555(models::Error),
+    Status555(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -222,7 +222,7 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdDiffstatGetError 
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdGetError {
     Status401(),
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -231,7 +231,7 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdGetError {
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdMergePostError {
     Status409(),
-    Status555(models::Error),
+    Status555(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -256,9 +256,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdPatchGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdPutError {
-    Status400(models::Error),
-    Status401(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status401(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -266,9 +266,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdPutError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdRequestChangesDeleteError {
-    Status400(models::Error),
-    Status401(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status401(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -276,9 +276,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdRequestChangesDel
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdRequestChangesPostError {
-    Status400(models::Error),
-    Status401(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status401(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -287,7 +287,7 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdRequestChangesPos
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdStatusesGetError {
     Status401(),
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -295,9 +295,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdStatusesGetError 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksGetError {
-    Status400(models::Error),
-    Status403(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -305,9 +305,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksGetError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksPostError {
-    Status400(models::Error),
-    Status403(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -315,8 +315,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksPostError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdDeleteError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -324,8 +324,8 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdDelete
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdGetError {
-    Status403(models::Error),
-    Status404(models::Error),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -333,9 +333,9 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdGetErr
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdPutError {
-    Status400(models::Error),
-    Status403(models::Error),
-    Status404(models::Error),
+    Status400(models::ApiError),
+    Status403(models::ApiError),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
@@ -343,13 +343,13 @@ pub enum RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdPutErr
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum WorkspacesWorkspacePullrequestsSelectedUserGetError {
-    Status404(models::Error),
+    Status404(models::ApiError),
     UnknownValue(serde_json::Value),
 }
 
 
 /// Returns a paginated list of all pull requests as part of which this commit was reviewed. Pull Request Commit Links app must be installed first before using this API; installation automatically occurs when 'Go to pull request' is clicked from the web interface for a commit's details.
-pub async fn get_pullrequests_for_commit(configuration: &configuration::Configuration, workspace: &str, repo_slug: &str, commit: &str, page: Option<i32>, pagelen: Option<i32>) -> Result<models::PaginatedPullrequests, Error<GetPullrequestsForCommitError>> {
+pub async fn get_pullrequests_for_commit(configuration: &configuration::Configuration, workspace: &str, repo_slug: &str, commit: &str, page: Option<i32>, pagelen: Option<i32>) -> Result<models::ApiPaginatedPullrequests, Error<GetPullrequestsForCommitError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_workspace = workspace;
     let p_path_repo_slug = repo_slug;
@@ -399,8 +399,8 @@ pub async fn get_pullrequests_for_commit(configuration: &configuration::Configur
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedPullrequests`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedPullrequests`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedPullrequests`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedPullrequests`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -410,7 +410,7 @@ pub async fn get_pullrequests_for_commit(configuration: &configuration::Configur
 }
 
 /// Returns the repository's default reviewers.  These are the users that are automatically added as reviewers on every new pull request that is created. To obtain the repository's default reviewers as well as the default reviewers inherited from the project, use the [effective-default-reveiwers](#api-repositories-workspace-repo-slug-effective-default-reviewers-get) endpoint.
-pub async fn repositories_workspace_repo_slug_default_reviewers_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str) -> Result<models::PaginatedAccounts, Error<RepositoriesWorkspaceRepoSlugDefaultReviewersGetError>> {
+pub async fn repositories_workspace_repo_slug_default_reviewers_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str) -> Result<models::ApiPaginatedAccounts, Error<RepositoriesWorkspaceRepoSlugDefaultReviewersGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_workspace = workspace;
@@ -451,8 +451,8 @@ pub async fn repositories_workspace_repo_slug_default_reviewers_get(configuratio
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedAccounts`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedAccounts`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedAccounts`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedAccounts`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -504,7 +504,7 @@ pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_
 }
 
 /// Returns the specified reviewer.  This can be used to test whether a user is among the repository's default reviewers list. A 404 indicates that that specified user is not a default reviewer.
-pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_get(configuration: &configuration::Configuration, repo_slug: &str, target_username: &str, workspace: &str) -> Result<models::Account, Error<RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernameGetError>> {
+pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_get(configuration: &configuration::Configuration, repo_slug: &str, target_username: &str, workspace: &str) -> Result<models::ApiAccount, Error<RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernameGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_target_username = target_username;
@@ -546,8 +546,8 @@ pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Account`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Account`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiAccount`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiAccount`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -557,7 +557,7 @@ pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_
 }
 
 /// Adds the specified user to the repository's list of default reviewers.  This method is idempotent. Adding a user a second time has no effect.
-pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_put(configuration: &configuration::Configuration, repo_slug: &str, target_username: &str, workspace: &str) -> Result<models::Account, Error<RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernamePutError>> {
+pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_put(configuration: &configuration::Configuration, repo_slug: &str, target_username: &str, workspace: &str) -> Result<models::ApiAccount, Error<RepositoriesWorkspaceRepoSlugDefaultReviewersTargetUsernamePutError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_target_username = target_username;
@@ -599,8 +599,8 @@ pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Account`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Account`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiAccount`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiAccount`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -610,7 +610,7 @@ pub async fn repositories_workspace_repo_slug_default_reviewers_target_username_
 }
 
 /// Returns the repository's effective default reviewers. This includes both default reviewers defined at the repository level as well as those inherited from its project.  These are the users that are automatically added as reviewers on every new pull request that is created.
-pub async fn repositories_workspace_repo_slug_effective_default_reviewers_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str) -> Result<models::PaginatedDefaultReviewerAndType, Error<RepositoriesWorkspaceRepoSlugEffectiveDefaultReviewersGetError>> {
+pub async fn repositories_workspace_repo_slug_effective_default_reviewers_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str) -> Result<models::ApiPaginatedDefaultReviewerAndType, Error<RepositoriesWorkspaceRepoSlugEffectiveDefaultReviewersGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_workspace = workspace;
@@ -651,8 +651,8 @@ pub async fn repositories_workspace_repo_slug_effective_default_reviewers_get(co
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedDefaultReviewerAndType`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedDefaultReviewerAndType`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedDefaultReviewerAndType`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedDefaultReviewerAndType`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -703,7 +703,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_activity_get(configur
 }
 
 /// Returns all pull requests on the specified repository.  By default only open pull requests are returned. This can be controlled using the `state` query parameter. To retrieve pull requests that are in one of multiple states, repeat the `state` parameter for each individual state.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
-pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str, state: Option<&str>) -> Result<models::PaginatedPullrequests, Error<RepositoriesWorkspaceRepoSlugPullrequestsGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str, state: Option<&str>) -> Result<models::ApiPaginatedPullrequests, Error<RepositoriesWorkspaceRepoSlugPullrequestsGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_workspace = workspace;
@@ -748,8 +748,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &c
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedPullrequests`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedPullrequests`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedPullrequests`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedPullrequests`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -759,7 +759,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &c
 }
 
 /// Creates a new pull request where the destination repository is this repository and the author is the authenticated user.  The minimum required fields to create a pull request are `title` and `source`, specified by a branch name.  ``` curl https://api.bitbucket.org/2.0/repositories/my-workspace/my-repository/pullrequests \\     -u my-username:my-password \\     --request POST \\     --header 'Content-Type: application/json' \\     --data '{         \"title\": \"My Title\",         \"source\": {             \"branch\": {                 \"name\": \"staging\"             }         }     }' ```  If the pull request's `destination` is not specified, it will default to the `repository.mainbranch`. To open a pull request to a different branch, say from a feature branch to a staging branch, specify a `destination` (same format as the `source`):  ``` {     \"title\": \"My Title\",     \"source\": {         \"branch\": {             \"name\": \"my-feature-branch\"         }     },     \"destination\": {         \"branch\": {             \"name\": \"staging\"         }     } } ```  Reviewers can be specified by adding an array of user objects as the `reviewers` property.  ``` {     \"title\": \"My Title\",     \"source\": {         \"branch\": {             \"name\": \"my-feature-branch\"         }     },     \"reviewers\": [         {             \"uuid\": \"{504c3b62-8120-4f0c-a7bc-87800b9d6f70}\"         }     ] } ```  Other fields:  * `description` - a string * `close_source_branch` - boolean that specifies if the source branch should be closed upon merging * `draft` - boolean that specifies whether the pull request is a draft
-pub async fn repositories_workspace_repo_slug_pullrequests_post(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str, _body: Option<models::Pullrequest>) -> Result<models::Pullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_post(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str, _body: Option<models::ApiPullrequest>) -> Result<models::ApiPullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_workspace = workspace;
@@ -802,8 +802,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_post(configuration: &
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Pullrequest`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Pullrequest`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequest`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequest`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -897,7 +897,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_appro
 }
 
 /// Approve the specified pull request as the authenticated user.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_approve_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::Participant, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdApprovePostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_approve_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiParticipant, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdApprovePostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -939,8 +939,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_appro
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Participant`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Participant`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiParticipant`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiParticipant`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -993,7 +993,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
 }
 
 /// Returns a specific pull request comment.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_get(configuration: &configuration::Configuration, comment_id: i64, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::PullrequestComment, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_get(configuration: &configuration::Configuration, comment_id: i64, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiPullrequestComment, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_comment_id = comment_id;
     let p_path_pull_request_id = pull_request_id;
@@ -1036,8 +1036,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PullrequestComment`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PullrequestComment`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequestComment`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequestComment`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1047,7 +1047,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
 }
 
 /// Updates a specific pull request comment.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_put(configuration: &configuration::Configuration, comment_id: i64, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: models::PullrequestComment) -> Result<models::PullrequestComment, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdPutError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_put(configuration: &configuration::Configuration, comment_id: i64, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: models::ApiPullrequestComment) -> Result<models::ApiPullrequestComment, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdPutError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_comment_id = comment_id;
     let p_path_pull_request_id = pull_request_id;
@@ -1092,8 +1092,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PullrequestComment`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PullrequestComment`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequestComment`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequestComment`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1144,7 +1144,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
     }
 }
 
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_resolve_post(configuration: &configuration::Configuration, comment_id: i64, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::CommentResolution, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdResolvePostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_comment_id_resolve_post(configuration: &configuration::Configuration, comment_id: i64, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiCommentResolution, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsCommentIdResolvePostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_comment_id = comment_id;
     let p_path_pull_request_id = pull_request_id;
@@ -1187,8 +1187,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::CommentResolution`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::CommentResolution`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiCommentResolution`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiCommentResolution`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1198,7 +1198,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
 }
 
 /// Returns a paginated list of the pull request's comments.  This includes both global, inline comments and replies.  The default sorting is oldest to newest and can be overridden with the `sort` query parameter.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::PaginatedPullrequestComments, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiPaginatedPullrequestComments, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1240,8 +1240,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedPullrequestComments`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedPullrequestComments`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedPullrequestComments`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedPullrequestComments`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1251,7 +1251,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
 }
 
 /// Creates a new pull request comment.  Returns the newly created pull request comment.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: models::PullrequestComment) -> Result<models::PullrequestComment, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsPostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comments_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: models::ApiPullrequestComment) -> Result<models::ApiPullrequestComment, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdCommentsPostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1295,8 +1295,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_comme
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PullrequestComment`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PullrequestComment`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequestComment`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequestComment`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1348,7 +1348,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_commi
 }
 
 /// Declines the pull request.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_decline_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::Pullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdDeclinePostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_decline_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiPullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdDeclinePostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1390,8 +1390,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_decli
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Pullrequest`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Pullrequest`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequest`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequest`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1485,7 +1485,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_diffs
 }
 
 /// Returns the specified pull request.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::Pullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiPullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1527,8 +1527,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_get(c
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Pullrequest`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Pullrequest`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequest`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequest`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1538,7 +1538,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_get(c
 }
 
 /// Merges the pull request.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_merge_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, r#async: Option<bool>, _body: Option<models::PullrequestMergeParameters>) -> Result<models::Pullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdMergePostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_merge_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, r#async: Option<bool>, _body: Option<models::ApiPullrequestMergeParameters>) -> Result<models::ApiPullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdMergePostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1586,8 +1586,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_merge
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Pullrequest`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Pullrequest`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequest`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequest`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1682,7 +1682,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_patch
 }
 
 /// Mutates the specified pull request.  This can be used to change the pull request's branches or description.  Only open pull requests can be mutated.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_put(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: Option<models::Pullrequest>) -> Result<models::Pullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdPutError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_put(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: Option<models::ApiPullrequest>) -> Result<models::ApiPullrequest, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdPutError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1726,8 +1726,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_put(c
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Pullrequest`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Pullrequest`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequest`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequest`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1777,7 +1777,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_reque
     }
 }
 
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_request_changes_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::Participant, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdRequestChangesPostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_request_changes_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str) -> Result<models::ApiParticipant, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdRequestChangesPostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1819,8 +1819,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_reque
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::Participant`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::Participant`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiParticipant`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiParticipant`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1830,7 +1830,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_reque
 }
 
 /// Returns all statuses (e.g. build results) for the given pull request.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, q: Option<&str>, sort: Option<&str>) -> Result<models::PaginatedCommitstatuses, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdStatusesGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, q: Option<&str>, sort: Option<&str>) -> Result<models::ApiPaginatedCommitstatuses, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdStatusesGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1880,8 +1880,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_statu
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedCommitstatuses`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedCommitstatuses`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedCommitstatuses`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedCommitstatuses`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1891,7 +1891,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_statu
 }
 
 /// Returns a paginated list of the pull request's tasks.  This endpoint supports filtering and sorting of the results by the 'task' field. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, q: Option<&str>, sort: Option<&str>, pagelen: Option<i32>) -> Result<models::PaginatedTasks, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, q: Option<&str>, sort: Option<&str>, pagelen: Option<i32>) -> Result<models::ApiPaginatedTasks, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -1945,8 +1945,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedTasks`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedTasks`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedTasks`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedTasks`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -1956,7 +1956,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
 }
 
 /// Creates a new pull request task.  Returns the newly created pull request task.  Tasks can optionally be created in relation to a comment specified by the comment's ID which will cause the task to appear below the comment on a pull request when viewed in Bitbucket.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: models::PullrequestTaskCreate) -> Result<models::PullrequestCommentTask, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksPostError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_post(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, workspace: &str, _body: models::ApiPullrequestTaskCreate) -> Result<models::ApiPullrequestCommentTask, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksPostError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -2000,8 +2000,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PullrequestCommentTask`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PullrequestCommentTask`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequestCommentTask`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequestCommentTask`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -2054,7 +2054,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
 }
 
 /// Returns a specific pull request task.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, task_id: i64, workspace: &str) -> Result<models::PullrequestCommentTask, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_get(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, task_id: i64, workspace: &str) -> Result<models::ApiPullrequestCommentTask, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -2097,8 +2097,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PullrequestCommentTask`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PullrequestCommentTask`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequestCommentTask`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequestCommentTask`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -2108,7 +2108,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
 }
 
 /// Updates a specific pull request task.
-pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_put(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, task_id: i64, workspace: &str, _body: models::PullrequestTaskUpdate) -> Result<models::PullrequestCommentTask, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdPutError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks_task_id_put(configuration: &configuration::Configuration, pull_request_id: i32, repo_slug: &str, task_id: i64, workspace: &str, _body: models::ApiPullrequestTaskUpdate) -> Result<models::ApiPullrequestCommentTask, Error<RepositoriesWorkspaceRepoSlugPullrequestsPullRequestIdTasksTaskIdPutError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_pull_request_id = pull_request_id;
     let p_path_repo_slug = repo_slug;
@@ -2153,8 +2153,8 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PullrequestCommentTask`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PullrequestCommentTask`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPullrequestCommentTask`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPullrequestCommentTask`")))),
         }
     } else {
         let content = resp.text().await?;
@@ -2164,7 +2164,7 @@ pub async fn repositories_workspace_repo_slug_pullrequests_pull_request_id_tasks
 }
 
 /// Returns all workspace pull requests authored by the specified user.  By default only open pull requests are returned. This can be controlled using the `state` query parameter. To retrieve pull requests that are in one of multiple states, repeat the `state` parameter for each individual state.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
-pub async fn workspaces_workspace_pullrequests_selected_user_get(configuration: &configuration::Configuration, selected_user: &str, workspace: &str, state: Option<&str>) -> Result<models::PaginatedPullrequests, Error<WorkspacesWorkspacePullrequestsSelectedUserGetError>> {
+pub async fn workspaces_workspace_pullrequests_selected_user_get(configuration: &configuration::Configuration, selected_user: &str, workspace: &str, state: Option<&str>) -> Result<models::ApiPaginatedPullrequests, Error<WorkspacesWorkspacePullrequestsSelectedUserGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_selected_user = selected_user;
     let p_path_workspace = workspace;
@@ -2209,8 +2209,8 @@ pub async fn workspaces_workspace_pullrequests_selected_user_get(configuration: 
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_path_to_error::deserialize(&mut serde_json::Deserializer::from_str(&content)).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::PaginatedPullrequests`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::PaginatedPullrequests`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ApiPaginatedPullrequests`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ApiPaginatedPullrequests`")))),
         }
     } else {
         let content = resp.text().await?;

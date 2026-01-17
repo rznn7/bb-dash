@@ -1,7 +1,6 @@
 use crate::{
-    bitbucket_api::{Account, PaginatedPullRequests},
-    bitbucket_client::BitbucketClient,
-    bitbucket_repo::BitbucketRepo,
+    bitbucket_api::PaginatedPullRequests, bitbucket_client::BitbucketClient,
+    bitbucket_repo::BitbucketRepo, models::Account,
 };
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -297,7 +296,8 @@ impl AccountConnectedWidget<'_> {
         let name = self
             .current_account
             .as_ref()
-            .map_or(LOADING_TEXT, |account| &account.display_name);
+            .and_then(|account| account.display_name.as_deref())
+            .unwrap_or(LOADING_TEXT);
 
         format!("  {} ", name)
     }

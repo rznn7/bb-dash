@@ -1,8 +1,9 @@
-use bitbucket_client::apis::configuration::Configuration;
+use bitbucket_client::apis::{configuration::Configuration, users_api::user_get};
 
 use crate::{
-    bitbucket_api::{Account, AppBitbucketApi, PaginatedPullRequests},
+    bitbucket_api::{AppBitbucketApi, PaginatedPullRequests},
     bitbucket_repo::BitbucketRepo,
+    models::Account,
 };
 
 #[derive(Clone, Debug)]
@@ -30,8 +31,8 @@ impl BitbucketClient {
     }
 
     pub async fn get_user(&self) -> Result<Account, anyhow::Error> {
-        let user = self.bitbucket_api.get_current_user().await?;
-        Ok(user)
+        let api_account: Account = user_get(&self.configuration).await?.into();
+        Ok(api_account)
     }
 
     pub async fn list_pull_requests(

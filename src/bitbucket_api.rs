@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use strum::Display;
 
+use crate::models::Account;
+
 #[derive(Clone, Debug)]
 pub struct AppBitbucketApi {
     http_client: reqwest::Client,
@@ -17,18 +19,6 @@ impl AppBitbucketApi {
             api_token,
             username,
         }
-    }
-
-    pub async fn get_current_user(&self) -> Result<Account, reqwest::Error> {
-        let url = format!("{}/user", &self.base_url);
-
-        self.http_client
-            .get(url)
-            .basic_auth(&self.username, Some(&self.api_token))
-            .send()
-            .await?
-            .json::<Account>()
-            .await
     }
 
     pub async fn list_pull_requests(
@@ -82,26 +72,6 @@ impl AppBitbucketApi {
             .json::<PaginatedPullRequests>()
             .await
     }
-}
-
-#[derive(Deserialize, Debug)]
-pub struct Account {
-    #[serde(rename = "type")]
-    pub _type: String,
-    pub links: AccountLinks,
-    pub display_name: String,
-    pub uuid: String,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct AccountLinks {
-    avatar: Link,
-}
-
-#[derive(Deserialize, Debug)]
-struct Link {
-    href: Option<String>,
-    name: Option<String>,
 }
 
 #[derive(Deserialize, Debug)]

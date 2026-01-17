@@ -9,6 +9,7 @@ mod bitbucket_api;
 mod bitbucket_client;
 mod bitbucket_repo;
 mod logging;
+mod models;
 mod tui;
 
 #[tokio::main]

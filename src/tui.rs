@@ -1,5 +1,5 @@
 use crate::{
-    bitbucket_api::{AppAccount, AppPaginatedPullRequests},
+    bitbucket_api::{Account, PaginatedPullRequests},
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
 };
@@ -24,8 +24,8 @@ pub struct App {
     selected_tab: SelectedTab,
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
-    current_account: ResourceState<AppAccount>,
-    my_pull_requests: ResourceState<AppPaginatedPullRequests>,
+    current_account: ResourceState<Account>,
+    my_pull_requests: ResourceState<PaginatedPullRequests>,
     bitbucket_client: BitbucketClient,
 }
 
@@ -237,7 +237,7 @@ impl<T> ResourceState<T> {
 const LOADING_TEXT: &str = "...";
 
 struct MyPullRequestsTabWidget<'a> {
-    pull_requests: Option<&'a AppPaginatedPullRequests>,
+    pull_requests: Option<&'a PaginatedPullRequests>,
 }
 
 impl Widget for MyPullRequestsTabWidget<'_> {
@@ -289,7 +289,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
 }
 
 struct AccountConnectedWidget<'a> {
-    current_account: Option<&'a AppAccount>,
+    current_account: Option<&'a Account>,
 }
 
 impl AccountConnectedWidget<'_> {

@@ -1,7 +1,7 @@
 use bitbucket_client::apis::configuration::Configuration;
 
 use crate::{
-    bitbucket_api::{AppAccount, AppBitbucketApi, AppPaginatedPullRequests},
+    bitbucket_api::{Account, AppBitbucketApi, PaginatedPullRequests},
     bitbucket_repo::BitbucketRepo,
 };
 
@@ -29,7 +29,7 @@ impl BitbucketClient {
         })
     }
 
-    pub async fn get_user(&self) -> Result<AppAccount, anyhow::Error> {
+    pub async fn get_user(&self) -> Result<Account, anyhow::Error> {
         let user = self.bitbucket_api.get_current_user().await?;
         Ok(user)
     }
@@ -37,7 +37,7 @@ impl BitbucketClient {
     pub async fn list_pull_requests(
         &self,
         bitbucket_repo: &BitbucketRepo,
-    ) -> Result<AppPaginatedPullRequests, anyhow::Error> {
+    ) -> Result<PaginatedPullRequests, anyhow::Error> {
         let workspace = bitbucket_repo.workspace();
         let repo_slug = bitbucket_repo.slug();
         let pull_requests = self

@@ -25,7 +25,8 @@ pub struct App {
     selected_tab: SelectedTab,
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
-    current_account: ResourceState<Account>,
+    account_connected: ResourceState<Account>,
+    account_connected_fetcher: Option<Fetcher<Account>>,
     my_pull_requests: ResourceState<PaginatedPullRequests>,
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
     bitbucket_client: BitbucketClient,
@@ -41,7 +42,8 @@ impl App {
             selected_tab: SelectedTab::default(),
             repo_path,
             bitbucket_repo,
-            current_account: ResourceState::Loading,
+            account_connected: ResourceState::Loading,
+            account_connected_fetcher: None,
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
             bitbucket_client: BitbucketClient::from_env()?,
@@ -51,19 +53,16 @@ impl App {
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
         let mut interval = get_app_interval();
 
-        let mut account_connected_fetcher = {
-            let client = self.bitbucket_client.clone();
-            Fetcher::new(async move { client.get_user().await })
-        };
-
+        self.load_account_connected();
         self.load_my_pull_requests();
 
         self.is_running = true;
         while self.is_running {
-            if let ResourceState::Loading = self.current_account
+            if let ResourceState::Loading = self.account_connected
+                && let Some(account_connected_fetcher) = self.account_connected_fetcher.as_mut()
                 && let Some(account) = account_connected_fetcher.try_get()
             {
-                self.current_account = ResourceState::Loaded(account);
+                self.account_connected = ResourceState::Loaded(account);
             }
 
             if let ResourceState::Loading = self.my_pull_requests
@@ -118,7 +117,7 @@ impl App {
         let app_title_char_count = app_title_text.chars().count() as u16;
 
         let account_connected_widget = AccountConnectedWidget {
-            current_account: self.current_account.get(),
+            current_account: self.account_connected.get(),
         };
 
         let [app_title, user_name, repo_slug] = Layout::horizontal([
@@ -164,6 +163,13 @@ impl App {
 
     fn quit(&mut self) {
         self.is_running = false;
+    }
+
+    fn load_account_connected(&mut self) {
+        self.account_connected_fetcher = {
+            let client = self.bitbucket_client.clone();
+            Some(Fetcher::new(async move { client.get_user().await }))
+        };
     }
 
     fn load_my_pull_requests(&mut self) {

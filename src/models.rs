@@ -1,3 +1,4 @@
+use anyhow::{self};
 use bitbucket_client::models::{ApiAccount, ApiAccountLinks, ApiLink};
 use bitbucket_client::models::{
     ApiPaginatedPullrequests, ApiPullrequest, ApiPullrequestEndpoint, ApiRepository,
@@ -5,6 +6,7 @@ use bitbucket_client::models::{
 };
 use serde::Deserialize;
 use strum::Display;
+use tracing::warn;
 
 #[derive(Debug)]
 pub struct Account {
@@ -73,9 +75,13 @@ impl From<ApiPaginatedPullrequests> for PaginatedPullRequests {
             pagelen: api_paginated_pullrequests.pagelen,
             next: api_paginated_pullrequests.next,
             previous: api_paginated_pullrequests.previous,
-            values: api_paginated_pullrequests
-                .values
-                .map(|api_pullrequests| api_pullrequests.into_iter().map(Into::into).collect()),
+            values: api_paginated_pullrequests.values.map(|api_pullrequests| {
+                api_pullrequests
+                    .into_iter()
+                    .map(PullRequest::try_from)
+                    .filter_map(|pr| pr.map_err(|e| warn!("skipping PR: {e}")).ok())
+                    .collect()
+            }),
         }
     }
 }
@@ -83,7 +89,7 @@ impl From<ApiPaginatedPullrequests> for PaginatedPullRequests {
 #[derive(Debug)]
 pub struct PullRequest {
     r#type: String,
-    pub id: Option<i32>,
+    pub id: i32,
     pub title: Option<String>,
     summary: Option<PullRequestSummary>,
     pub state: Option<PullRequestState>,
@@ -93,11 +99,15 @@ pub struct PullRequest {
     merge_commit: Option<PullRequestCommit>,
 }
 
-impl From<ApiPullrequest> for PullRequest {
-    fn from(api_pullrequest: ApiPullrequest) -> Self {
-        Self {
+impl TryFrom<ApiPullrequest> for PullRequest {
+    type Error = anyhow::Error;
+
+    fn try_from(api_pullrequest: ApiPullrequest) -> Result<Self, Self::Error> {
+        Ok(Self {
             r#type: api_pullrequest.r#type,
-            id: api_pullrequest.id,
+            id: api_pullrequest
+                .id
+                .ok_or_else(|| anyhow::anyhow!("PullRequest missing id"))?,
             title: api_pullrequest.title,
             summary: api_pullrequest
                 .summary
@@ -115,7 +125,7 @@ impl From<ApiPullrequest> for PullRequest {
             merge_commit: api_pullrequest
                 .merge_commit
                 .and_then(|value| serde_json::from_value(value).ok()),
-        }
+        })
     }
 }
 

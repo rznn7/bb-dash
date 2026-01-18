@@ -27,7 +27,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
             let mut rows = Vec::new();
 
             for pr in pull_requests.values.as_deref().unwrap_or(&[]) {
-                let id = pr.id.map_or(String::from("?"), |id| id.to_string());
+                let id = pr.id.to_string();
                 let state = pr
                     .state
                     .as_ref()

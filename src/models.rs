@@ -6,9 +6,8 @@ use bitbucket_client::models::{
 use serde::Deserialize;
 use strum::Display;
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct Account {
-    #[serde(rename = "type")]
     pub r#type: String,
     pub links: Option<AccountLinks>,
     pub display_name: Option<String>,
@@ -26,7 +25,7 @@ impl From<ApiAccount> for Account {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct AccountLinks {
     avatar: Option<Box<Link>>,
 }
@@ -41,7 +40,7 @@ impl From<ApiAccountLinks> for AccountLinks {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 struct Link {
     href: Option<String>,
     name: Option<String>,
@@ -56,26 +55,7 @@ impl From<ApiLink> for Link {
     }
 }
 
-#[derive(Clone, Debug)]
-pub struct AppBitbucketApi {
-    http_client: reqwest::Client,
-    base_url: String,
-    api_token: String,
-    username: String,
-}
-
-impl AppBitbucketApi {
-    pub fn new(base_url: String, api_token: String, username: String) -> Self {
-        AppBitbucketApi {
-            http_client: reqwest::Client::new(),
-            base_url,
-            api_token,
-            username,
-        }
-    }
-}
-
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct PaginatedPullRequests {
     size: Option<u32>,
     page: Option<u32>,
@@ -100,9 +80,8 @@ impl From<ApiPaginatedPullrequests> for PaginatedPullRequests {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct PullRequest {
-    #[serde(rename = "type")]
     r#type: String,
     pub id: Option<i32>,
     pub title: Option<String>,
@@ -140,7 +119,7 @@ impl From<ApiPullrequest> for PullRequest {
     }
 }
 
-#[derive(Deserialize, Debug, Display)]
+#[derive(Debug, Display)]
 pub enum PullRequestState {
     Open,
     Merged,
@@ -166,7 +145,7 @@ pub struct PullRequestSummary {
     html: Option<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct PullRequestEndpoint {
     repository: Option<Box<Repository>>,
     pub branch: Option<PullRequestBranch>,
@@ -189,9 +168,8 @@ impl From<ApiPullrequestEndpoint> for PullRequestEndpoint {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Debug)]
 pub struct Repository {
-    #[serde(rename = "type")]
     r#type: String,
     uuid: String,
     full_name: Option<String>,
@@ -214,22 +192,6 @@ impl From<ApiRepository> for Repository {
 #[derive(Deserialize, Debug)]
 pub struct PullRequestBranch {
     pub name: String,
-}
-
-#[derive(Deserialize, Debug)]
-pub enum MergeStrategy {
-    #[serde(rename = "merge_commit")]
-    MergeCommit,
-    #[serde(rename = "squash")]
-    Squash,
-    #[serde(rename = "fast_forward")]
-    FastForward,
-    #[serde(rename = "squash_fast_forward")]
-    SquashFastForward,
-    #[serde(rename = "rebase_fast_forward")]
-    RebaseFastForward,
-    #[serde(rename = "rebase_merge")]
-    RebaseMerge,
 }
 
 #[derive(Deserialize, Debug)]

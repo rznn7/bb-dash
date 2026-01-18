@@ -1,7 +1,7 @@
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Rect},
-    style::{Style, Stylize},
+    style::{Modifier, Style, Stylize},
     widgets::{Paragraph, Row, Table, Widget},
 };
 
@@ -14,6 +14,7 @@ const LOADING_TEXT: &str = "...";
 
 pub struct MyPullRequestsTabWidget<'a> {
     pub pull_requests: Option<&'a PaginatedPullRequests>,
+    pub selected_pr_idx: Option<usize>,
 }
 
 impl Widget for MyPullRequestsTabWidget<'_> {
@@ -26,7 +27,13 @@ impl Widget for MyPullRequestsTabWidget<'_> {
             let mut max_length_destination_branch = 0;
             let mut rows = Vec::new();
 
-            for pr in pull_requests.values.as_deref().unwrap_or(&[]) {
+            for (i, pr) in pull_requests
+                .values
+                .as_deref()
+                .unwrap_or(&[])
+                .iter()
+                .enumerate()
+            {
                 let id = pr.id.to_string();
                 let state = pr
                     .state
@@ -55,13 +62,16 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                 max_length_destination_branch =
                     max_length_destination_branch.max(destination_branch.chars().count());
 
-                rows.push(Row::new(vec![
-                    id,
-                    state,
-                    title,
-                    source_branch,
-                    destination_branch,
-                ]));
+                let row_style = self
+                    .selected_pr_idx
+                    .filter(|selected_idx| *selected_idx == i)
+                    .map(|_| Style::new().add_modifier(Modifier::REVERSED))
+                    .unwrap_or_default();
+
+                let row = Row::new(vec![id, state, title, source_branch, destination_branch])
+                    .style(row_style);
+
+                rows.push(row);
             }
 
             let widths = [

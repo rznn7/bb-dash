@@ -29,6 +29,7 @@ pub struct App {
     account_connected_fetcher: Option<Fetcher<Account>>,
     my_pull_requests: ResourceState<PaginatedPullRequests>,
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
+    my_pull_requests_selected: Option<usize>,
     bitbucket_client: BitbucketClient,
 }
 
@@ -46,6 +47,7 @@ impl App {
             account_connected_fetcher: None,
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
+            my_pull_requests_selected: Some(0),
             bitbucket_client: BitbucketClient::from_env()?,
         })
     }
@@ -58,19 +60,8 @@ impl App {
 
         self.is_running = true;
         while self.is_running {
-            if let ResourceState::Loading = self.account_connected
-                && let Some(account_connected_fetcher) = self.account_connected_fetcher.as_mut()
-                && let Some(account) = account_connected_fetcher.try_get()
-            {
-                self.account_connected = ResourceState::Loaded(account);
-            }
-
-            if let ResourceState::Loading = self.my_pull_requests
-                && let Some(pull_requests_fetcher) = self.my_pull_requests_fetcher.as_mut()
-                && let Some(pull_requests) = pull_requests_fetcher.try_get()
-            {
-                self.my_pull_requests = ResourceState::Loaded(pull_requests);
-            }
+            self.update_account_connected();
+            self.update_my_pull_requests();
 
             tokio::select! {
                 _ = interval.tick() => {terminal.draw(|frame| self.draw(frame))?;},
@@ -104,6 +95,7 @@ impl App {
                 frame.render_widget(
                     MyPullRequestsTabWidget {
                         pull_requests: self.my_pull_requests.get(),
+                        selected_pr_idx: self.my_pull_requests_selected,
                     },
                     main_area,
                 );
@@ -149,6 +141,8 @@ impl App {
             KeyCode::Char('l') | KeyCode::Right => self.next_tab(),
             KeyCode::Char('h') | KeyCode::Left => self.previous_tab(),
             KeyCode::Char('r') => self.load_my_pull_requests(),
+            KeyCode::Down => self.change_selected_my_pull_request_down(),
+            KeyCode::Up => self.change_selected_my_pull_request_up(),
             _ => {}
         }
     }
@@ -172,6 +166,25 @@ impl App {
         };
     }
 
+    fn update_account_connected(&mut self) {
+        if let ResourceState::Loading = self.account_connected
+            && let Some(account_connected_fetcher) = self.account_connected_fetcher.as_mut()
+            && let Some(account) = account_connected_fetcher.try_get()
+        {
+            self.account_connected = ResourceState::Loaded(account);
+        }
+    }
+
+    fn update_my_pull_requests(&mut self) {
+        if let ResourceState::Loading = self.my_pull_requests
+            && let Some(pull_requests_fetcher) = self.my_pull_requests_fetcher.as_mut()
+            && let Some(pull_requests) = pull_requests_fetcher.try_get()
+        {
+            self.my_pull_requests = ResourceState::Loaded(pull_requests);
+            self.my_pull_requests_selected = Some(0);
+        }
+    }
+
     fn load_my_pull_requests(&mut self) {
         self.my_pull_requests = ResourceState::Loading;
         self.my_pull_requests_fetcher = {
@@ -181,6 +194,40 @@ impl App {
                 client.list_pull_requests(&repo, None).await
             }))
         };
+    }
+
+    fn change_selected_my_pull_request_down(&mut self) {
+        let Some(current_idx) = self.my_pull_requests_selected else {
+            return;
+        };
+
+        let Some(pull_requests) = self.my_pull_requests.get() else {
+            return;
+        };
+
+        let max_idx = pull_requests
+            .values
+            .as_ref()
+            .map_or(0, |v| v.len().saturating_sub(1));
+
+        self.my_pull_requests_selected = Some(current_idx.saturating_add(1).min(max_idx));
+    }
+
+    fn change_selected_my_pull_request_up(&mut self) {
+        let Some(current_idx) = self.my_pull_requests_selected else {
+            return;
+        };
+
+        let Some(pull_requests) = self.my_pull_requests.get() else {
+            return;
+        };
+
+        let max_idx = pull_requests
+            .values
+            .as_ref()
+            .map_or(0, |v| v.len().saturating_sub(1));
+
+        self.my_pull_requests_selected = Some(current_idx.saturating_sub(1).min(max_idx));
     }
 }
 

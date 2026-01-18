@@ -1,6 +1,7 @@
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
+    fetcher::{Fetcher, ResourceState},
     models::{Account, PaginatedPullRequests},
 };
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
@@ -26,6 +27,7 @@ pub struct App {
     bitbucket_repo: BitbucketRepo,
     current_account: ResourceState<Account>,
     my_pull_requests: ResourceState<PaginatedPullRequests>,
+    my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
     bitbucket_client: BitbucketClient,
 }
 
@@ -41,6 +43,7 @@ impl App {
             bitbucket_repo,
             current_account: ResourceState::Loading,
             my_pull_requests: ResourceState::Loading,
+            my_pull_requests_fetcher: None,
             bitbucket_client: BitbucketClient::from_env()?,
         })
     }
@@ -53,11 +56,7 @@ impl App {
             Fetcher::new(async move { client.get_user().await })
         };
 
-        let mut my_pull_requests_fetcher = {
-            let client = self.bitbucket_client.clone();
-            let repo = self.bitbucket_repo.clone();
-            Fetcher::new(async move { client.list_pull_requests(&repo, None).await })
-        };
+        self.load_my_pull_requests();
 
         self.is_running = true;
         while self.is_running {
@@ -68,7 +67,8 @@ impl App {
             }
 
             if let ResourceState::Loading = self.my_pull_requests
-                && let Some(pull_requests) = my_pull_requests_fetcher.try_get()
+                && let Some(pull_requests_fetcher) = self.my_pull_requests_fetcher.as_mut()
+                && let Some(pull_requests) = pull_requests_fetcher.try_get()
             {
                 self.my_pull_requests = ResourceState::Loaded(pull_requests);
             }
@@ -149,6 +149,7 @@ impl App {
             KeyCode::Char('q') => self.quit(),
             KeyCode::Char('l') | KeyCode::Right => self.next_tab(),
             KeyCode::Char('h') | KeyCode::Left => self.previous_tab(),
+            KeyCode::Char('r') => self.load_my_pull_requests(),
             _ => {}
         }
     }
@@ -163,6 +164,17 @@ impl App {
 
     fn quit(&mut self) {
         self.is_running = false;
+    }
+
+    fn load_my_pull_requests(&mut self) {
+        self.my_pull_requests = ResourceState::Loading;
+        self.my_pull_requests_fetcher = {
+            let client = self.bitbucket_client.clone();
+            let repo = self.bitbucket_repo.clone();
+            Some(Fetcher::new(async move {
+                client.list_pull_requests(&repo, None).await
+            }))
+        };
     }
 }
 
@@ -193,44 +205,6 @@ impl SelectedTab {
         let current_index = self as usize;
         let next_index = current_index.saturating_add(1);
         Self::from_repr(next_index).unwrap_or(self)
-    }
-}
-
-struct Fetcher<T> {
-    rx: tokio::sync::oneshot::Receiver<Result<T, anyhow::Error>>,
-}
-
-impl<T> Fetcher<T> {
-    fn new<F>(task: F) -> Self
-    where
-        F: Future<Output = Result<T, anyhow::Error>> + Send + 'static,
-        T: Send + 'static,
-    {
-        let (tx, rx) = tokio::sync::oneshot::channel();
-        tokio::spawn(async move {
-            let task_result = task.await;
-            tx.send(task_result).ok()
-        });
-        Self { rx }
-    }
-
-    fn try_get(&mut self) -> Option<T> {
-        self.rx.try_recv().ok().and_then(|r| r.ok())
-    }
-}
-
-enum ResourceState<T> {
-    Loading,
-    Loaded(T),
-    Failed,
-}
-
-impl<T> ResourceState<T> {
-    fn get(&self) -> Option<&T> {
-        match self {
-            ResourceState::Loaded(data) => Some(data),
-            _ => None,
-        }
     }
 }
 

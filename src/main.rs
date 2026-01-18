@@ -7,6 +7,7 @@ use std::env;
 
 mod bitbucket_client;
 mod bitbucket_repo;
+mod fetcher;
 mod logging;
 mod models;
 mod tui;

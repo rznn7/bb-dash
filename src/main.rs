@@ -11,6 +11,7 @@ mod fetcher;
 mod logging;
 mod models;
 mod tui;
+mod widgets;
 
 #[tokio::main]
 async fn main() -> Result<(), anyhow::Error> {

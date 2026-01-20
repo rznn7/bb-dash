@@ -1,9 +1,12 @@
+use crate::components::Component;
+use crate::components::account_connected::AccountConnectedComponent;
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
+    components::ComponentContext,
     fetcher::{Fetcher, ResourceState},
-    models::{Account, PaginatedPullRequests},
-    widgets::{AccountConnectedWidget, CurrentRepoWidget, MyPullRequestsTabWidget},
+    models::PaginatedPullRequests,
+    widgets::{CurrentRepoWidget, MyPullRequestsTabWidget},
 };
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -25,12 +28,11 @@ pub struct App {
     selected_tab: SelectedTab,
     repo_path: String,
     bitbucket_repo: BitbucketRepo,
-    account_connected: ResourceState<Account>,
-    account_connected_fetcher: Option<Fetcher<Account>>,
+    bitbucket_client: BitbucketClient,
     my_pull_requests: ResourceState<PaginatedPullRequests>,
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
     my_pull_requests_selected: Option<usize>,
-    bitbucket_client: BitbucketClient,
+    account_component: AccountConnectedComponent,
 }
 
 impl App {
@@ -43,25 +45,28 @@ impl App {
             selected_tab: SelectedTab::default(),
             repo_path,
             bitbucket_repo,
-            account_connected: ResourceState::Loading,
-            account_connected_fetcher: None,
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
             my_pull_requests_selected: Some(0),
             bitbucket_client: BitbucketClient::from_env()?,
+            account_component: AccountConnectedComponent::new(),
         })
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
         let mut interval = get_app_interval();
+        let component_ctx = ComponentContext {
+            client: self.bitbucket_client.clone(),
+            repo: self.bitbucket_repo.clone(),
+        };
+        self.account_component.init(&component_ctx);
 
-        self.load_account_connected();
         self.load_my_pull_requests();
 
         self.is_running = true;
         while self.is_running {
-            self.update_account_connected();
             self.update_my_pull_requests();
+            self.account_component.update();
 
             tokio::select! {
                 _ = interval.tick() => {terminal.draw(|frame| self.draw(frame))?;},
@@ -108,13 +113,9 @@ impl App {
         let app_title_text = String::from("  bb-dash ");
         let app_title_char_count = app_title_text.chars().count() as u16;
 
-        let account_connected_widget = AccountConnectedWidget {
-            current_account: self.account_connected.get(),
-        };
-
         let [app_title, user_name, repo_slug] = Layout::horizontal([
             Max(app_title_char_count),
-            Max(account_connected_widget.size()),
+            Max(self.account_component.size()),
             Fill(1),
         ])
         .areas(footer);
@@ -125,7 +126,7 @@ impl App {
             app_title,
         );
 
-        frame.render_widget(account_connected_widget, user_name);
+        self.account_component.render(frame, user_name);
 
         frame.render_widget(
             CurrentRepoWidget {
@@ -157,22 +158,6 @@ impl App {
 
     fn quit(&mut self) {
         self.is_running = false;
-    }
-
-    fn load_account_connected(&mut self) {
-        self.account_connected_fetcher = {
-            let client = self.bitbucket_client.clone();
-            Some(Fetcher::new(async move { client.get_user().await }))
-        };
-    }
-
-    fn update_account_connected(&mut self) {
-        if let ResourceState::Loading = self.account_connected
-            && let Some(account_connected_fetcher) = self.account_connected_fetcher.as_mut()
-            && let Some(account) = account_connected_fetcher.try_get()
-        {
-            self.account_connected = ResourceState::Loaded(account);
-        }
     }
 
     fn update_my_pull_requests(&mut self) {

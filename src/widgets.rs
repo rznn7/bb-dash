@@ -1,14 +1,11 @@
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Rect},
-    style::{Modifier, Style, Stylize},
+    style::{Modifier, Style},
     widgets::{Paragraph, Row, Table, Widget},
 };
 
-use crate::{
-    bitbucket_repo::BitbucketRepo,
-    models::{Account, PaginatedPullRequests},
-};
+use crate::{bitbucket_repo::BitbucketRepo, models::PaginatedPullRequests};
 
 const LOADING_TEXT: &str = "...";
 
@@ -85,34 +82,6 @@ impl Widget for MyPullRequestsTabWidget<'_> {
         } else {
             Paragraph::new(LOADING_TEXT).render(area, buf);
         }
-    }
-}
-
-pub struct AccountConnectedWidget<'a> {
-    pub current_account: Option<&'a Account>,
-}
-
-impl AccountConnectedWidget<'_> {
-    fn formatted_text(&self) -> String {
-        let name = self
-            .current_account
-            .as_ref()
-            .and_then(|account| account.display_name.as_deref())
-            .unwrap_or(LOADING_TEXT);
-
-        format!("  {} ", name)
-    }
-
-    pub fn size(&self) -> u16 {
-        self.formatted_text().chars().count() as u16
-    }
-}
-
-impl Widget for AccountConnectedWidget<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        Paragraph::new(self.formatted_text())
-            .style(Style::default().reversed())
-            .render(area, buf);
     }
 }
 

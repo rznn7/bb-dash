@@ -6,7 +6,6 @@ use ratatui::Frame;
 use ratatui::buffer::Buffer;
 use ratatui::prelude::Rect;
 use ratatui::style::Style;
-use ratatui::style::Stylize;
 use ratatui::widgets::Paragraph;
 use ratatui::widgets::Widget;
 
@@ -81,7 +80,7 @@ impl AccountConnectedWidget<'_> {
 impl Widget for AccountConnectedWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         Paragraph::new(self.formatted_text())
-            .style(Style::default().reversed())
+            .style(Style::default())
             .render(area, buf);
     }
 }

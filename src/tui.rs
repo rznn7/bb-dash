@@ -24,6 +24,7 @@ use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 
 pub struct App {
     is_running: bool,
+    accent_color: Color,
     event_stream: EventStream,
     selected_tab: SelectedTab,
     repo_path: String,
@@ -36,11 +37,11 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(repo_path: Option<String>) -> anyhow::Result<Self> {
-        let repo_path = repo_path.unwrap_or(String::from("."));
+    pub fn new(repo_path: String, accent_color: Color) -> anyhow::Result<Self> {
         let bitbucket_repo = BitbucketRepo::new(&repo_path)?;
         Ok(Self {
             is_running: false,
+            accent_color,
             event_stream: EventStream::default(),
             selected_tab: SelectedTab::default(),
             repo_path,
@@ -121,8 +122,7 @@ impl App {
         .areas(footer);
 
         frame.render_widget(
-            Paragraph::new(app_title_text)
-                .style(Style::default().reversed().fg(Color::Blue).bold()),
+            Paragraph::new(app_title_text).style(Style::default().reversed().fg(self.accent_color)),
             app_title,
         );
 

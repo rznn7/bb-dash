@@ -3,7 +3,7 @@
 use ratatui::style::Color;
 use tracing::info;
 
-use crate::{components::account_connected, logging::initialize_logging, tui::App};
+use crate::{logging::initialize_logging, tui::App};
 use std::env;
 
 mod bitbucket_client;

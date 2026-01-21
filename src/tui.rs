@@ -1,12 +1,13 @@
 use crate::components::Component;
 use crate::components::account_connected::AccountConnectedComponent;
+use crate::components::current_repo::CurrentRepoComponent;
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
     components::ComponentContext,
     fetcher::{Fetcher, ResourceState},
     models::PaginatedPullRequests,
-    widgets::{CurrentRepoWidget, MyPullRequestsTabWidget},
+    widgets::MyPullRequestsTabWidget,
 };
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -16,7 +17,7 @@ use ratatui::{
         Constraint::{Fill, Length, Max, Min},
         Layout,
     },
-    style::{Color, Style, Stylize},
+    style::{Color, Style},
     widgets::{Paragraph, Tabs},
 };
 use std::time::Duration;
@@ -34,6 +35,7 @@ pub struct App {
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
     my_pull_requests_selected: Option<usize>,
     account_component: AccountConnectedComponent,
+    current_repo_component: CurrentRepoComponent,
 }
 
 impl App {
@@ -51,6 +53,7 @@ impl App {
             my_pull_requests_selected: Some(0),
             bitbucket_client: BitbucketClient::from_env()?,
             account_component: AccountConnectedComponent::new(),
+            current_repo_component: CurrentRepoComponent::new(),
         })
     }
 
@@ -61,6 +64,7 @@ impl App {
             repo: self.bitbucket_repo.clone(),
         };
         self.account_component.init(&component_ctx);
+        self.current_repo_component.init(&component_ctx);
 
         self.load_my_pull_requests();
 
@@ -127,13 +131,7 @@ impl App {
         );
 
         self.account_component.render(frame, user_name);
-
-        frame.render_widget(
-            CurrentRepoWidget {
-                bitbucket_repo: &self.bitbucket_repo,
-            },
-            repo_slug,
-        );
+        self.current_repo_component.render(frame, repo_slug);
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {

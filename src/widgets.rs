@@ -5,7 +5,7 @@ use ratatui::{
     widgets::{Paragraph, Row, Table, Widget},
 };
 
-use crate::{bitbucket_repo::BitbucketRepo, models::PaginatedPullRequests};
+use crate::models::PaginatedPullRequests;
 
 const LOADING_TEXT: &str = "...";
 
@@ -82,16 +82,5 @@ impl Widget for MyPullRequestsTabWidget<'_> {
         } else {
             Paragraph::new(LOADING_TEXT).render(area, buf);
         }
-    }
-}
-
-pub struct CurrentRepoWidget<'a> {
-    pub bitbucket_repo: &'a BitbucketRepo,
-}
-
-impl Widget for CurrentRepoWidget<'_> {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let formatted = format!("  {}", self.bitbucket_repo.slug());
-        Paragraph::new(formatted).render(area, buf);
     }
 }

@@ -5,11 +5,12 @@ use crate::bitbucket_client::BitbucketClient;
 use crate::bitbucket_repo::BitbucketRepo;
 
 pub mod account_connected;
+pub mod current_repo;
 
 pub trait Component {
     fn init(&mut self, ctx: &ComponentContext);
     fn update(&mut self);
-    fn render(&mut self, f: &mut Frame, rect: Rect);
+    fn render(&mut self, frame: &mut Frame, area: Rect);
 }
 
 pub struct ComponentContext {

@@ -19,7 +19,7 @@ mod widgets;
 async fn main() -> Result<(), anyhow::Error> {
     initialize_logging()?;
 
-    info!("app started");
+    info!("app starting");
 
     let repo_path = env::args().nth(1).unwrap_or(String::from("."));
     let accent_color = Color::Green;
@@ -31,6 +31,8 @@ async fn main() -> Result<(), anyhow::Error> {
     };
 
     ratatui::restore();
+
+    info!("app closing");
 
     result
 }

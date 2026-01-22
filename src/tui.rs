@@ -22,6 +22,7 @@ use ratatui::{
 };
 use std::time::Duration;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
+use tracing::info;
 
 pub struct App {
     is_running: bool,
@@ -58,6 +59,7 @@ impl App {
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
+        info!("start running");
         let mut interval = get_app_interval();
         let component_ctx = ComponentContext {
             client: self.bitbucket_client.clone(),
@@ -83,6 +85,7 @@ impl App {
 
             }
         }
+        info!("stop running");
         Ok(())
     }
 

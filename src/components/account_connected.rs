@@ -2,6 +2,7 @@ use crate::components::Component;
 use crate::components::ComponentContext;
 use crate::fetcher::{Fetcher, ResourceState};
 use crate::models::Account;
+use crossterm::event::KeyEvent;
 use ratatui::Frame;
 use ratatui::buffer::Buffer;
 use ratatui::prelude::Rect;
@@ -49,7 +50,9 @@ impl Component for AccountConnectedComponent {
         }
     }
 
-    fn render(&mut self, frame: &mut Frame, area: Rect) {
+    fn handle_event_key(&mut self, key_event: KeyEvent) {}
+
+    fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = AccountConnectedWidget {
             account: self.account_connected.get(),
         };

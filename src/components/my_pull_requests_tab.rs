@@ -1,13 +1,81 @@
+use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
+    Frame,
     buffer::Buffer,
     layout::{Constraint, Rect},
     style::{Modifier, Style},
     widgets::{Paragraph, Row, Table, Widget},
 };
 
-use crate::models::PaginatedPullRequests;
+use crate::{
+    bitbucket_client::BitbucketClient,
+    bitbucket_repo::BitbucketRepo,
+    components::{Component, ComponentContext},
+    fetcher::{Fetcher, ResourceState},
+    models::PaginatedPullRequests,
+};
 
 const LOADING_TEXT: &str = "...";
+
+pub struct MyPullRequestsTabComponent {
+    my_pull_requests: ResourceState<PaginatedPullRequests>,
+    my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
+    bitbucket_client: Option<BitbucketClient>,
+    bitbucket_repo: Option<BitbucketRepo>,
+}
+
+impl MyPullRequestsTabComponent {
+    pub fn new() -> Self {
+        Self {
+            my_pull_requests: ResourceState::Loading,
+            my_pull_requests_fetcher: None,
+            bitbucket_client: None,
+            bitbucket_repo: None,
+        }
+    }
+
+    fn fetch_pull_requests(&mut self) {
+        self.my_pull_requests = ResourceState::Loading;
+        self.my_pull_requests_fetcher = {
+            let client = self.bitbucket_client.clone().unwrap();
+            let repo = self.bitbucket_repo.clone().unwrap();
+            Some(Fetcher::new(async move {
+                client.list_pull_requests(&repo, None).await
+            }))
+        };
+    }
+}
+
+impl Component for MyPullRequestsTabComponent {
+    fn init(&mut self, ctx: &ComponentContext) {
+        self.bitbucket_client = Some(ctx.client.clone());
+        self.bitbucket_repo = Some(ctx.repo.clone());
+        self.fetch_pull_requests();
+    }
+
+    fn update(&mut self) {
+        if let ResourceState::Loading = self.my_pull_requests
+            && let Some(pr_fetcher) = self.my_pull_requests_fetcher.as_mut()
+            && let Some(pr) = pr_fetcher.try_get()
+        {
+            self.my_pull_requests = ResourceState::Loaded(pr);
+        }
+    }
+
+    fn handle_event_key(&mut self, key_event: KeyEvent) {
+        if let KeyCode::Char('r') = key_event.code {
+            self.fetch_pull_requests()
+        }
+    }
+
+    fn render(&self, frame: &mut Frame, area: Rect) {
+        let widget = MyPullRequestsTabWidget {
+            pull_requests: self.my_pull_requests.get(),
+            selected_pr_idx: None,
+        };
+        frame.render_widget(widget, area);
+    }
+}
 
 pub struct MyPullRequestsTabWidget<'a> {
     pub pull_requests: Option<&'a PaginatedPullRequests>,

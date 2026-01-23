@@ -24,7 +24,9 @@ impl Component for CurrentRepoComponent {
 
     fn update(&mut self) {}
 
-    fn render(&mut self, frame: &mut Frame, area: Rect) {
+    fn handle_event_key(&mut self, key_event: crossterm::event::KeyEvent) {}
+
+    fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = CurrentRepoWidget {
             repo_slug: self.repo_slug.clone().unwrap_or(String::from("?")),
         };

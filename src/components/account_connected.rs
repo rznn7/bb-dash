@@ -1,5 +1,5 @@
+use crate::bitbucket_client::BitbucketClient;
 use crate::components::Component;
-use crate::components::ComponentContext;
 use crate::fetcher::{Fetcher, ResourceState};
 use crate::models::Account;
 use crossterm::event::KeyEvent;
@@ -15,11 +15,13 @@ const LOADING_TEXT: &str = "...";
 pub struct AccountConnectedComponent {
     account_connected: ResourceState<Account>,
     account_connected_fetcher: Option<Fetcher<Account>>,
+    bitbucket_client: BitbucketClient,
 }
 
 impl AccountConnectedComponent {
-    pub fn new() -> Self {
+    pub fn new(bitbucket_client: BitbucketClient) -> Self {
         Self {
+            bitbucket_client,
             account_connected: ResourceState::Loading,
             account_connected_fetcher: None,
         }
@@ -31,14 +33,19 @@ impl AccountConnectedComponent {
         }
         .size()
     }
+
+    fn fetch_account(&mut self) {
+        self.account_connected = ResourceState::Loading;
+        self.account_connected_fetcher = {
+            let client = self.bitbucket_client.clone();
+            Some(Fetcher::new(async move { client.get_user().await }))
+        };
+    }
 }
 
 impl Component for AccountConnectedComponent {
-    fn init(&mut self, ctx: &ComponentContext) {
-        self.account_connected_fetcher = {
-            let client = ctx.client.clone();
-            Some(Fetcher::new(async move { client.get_user().await }))
-        };
+    fn init(&mut self) {
+        self.fetch_account();
     }
 
     fn update(&mut self) {

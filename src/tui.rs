@@ -2,9 +2,7 @@ use crate::components::Component;
 use crate::components::account_connected::AccountConnectedComponent;
 use crate::components::current_repo::CurrentRepoComponent;
 use crate::components::my_pull_requests_tab::MyPullRequestsTabComponent;
-use crate::{
-    bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo, components::ComponentContext,
-};
+use crate::{bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo};
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
 use ratatui::{
@@ -36,30 +34,30 @@ pub struct App {
 impl App {
     pub fn new(repo_path: String, accent_color: Color) -> anyhow::Result<Self> {
         let bitbucket_repo = BitbucketRepo::new(&repo_path)?;
+        let bitbucket_client = BitbucketClient::from_env()?;
         Ok(Self {
             is_running: false,
             accent_color,
             event_stream: EventStream::default(),
             selected_tab: SelectedTab::default(),
             repo_path,
+            account_component: AccountConnectedComponent::new(bitbucket_client.clone()),
+            current_repo_component: CurrentRepoComponent::new(bitbucket_repo.clone()),
+            my_pull_requests_component: MyPullRequestsTabComponent::new(
+                bitbucket_client.clone(),
+                bitbucket_repo.clone(),
+            ),
             bitbucket_repo,
-            bitbucket_client: BitbucketClient::from_env()?,
-            account_component: AccountConnectedComponent::new(),
-            current_repo_component: CurrentRepoComponent::new(),
-            my_pull_requests_component: MyPullRequestsTabComponent::new(),
+            bitbucket_client,
         })
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
         info!("start running");
         let mut interval = get_app_interval();
-        let component_ctx = ComponentContext {
-            client: self.bitbucket_client.clone(),
-            repo: self.bitbucket_repo.clone(),
-        };
-        self.account_component.init(&component_ctx);
-        self.current_repo_component.init(&component_ctx);
-        self.my_pull_requests_component.init(&component_ctx);
+        self.account_component.init();
+        self.current_repo_component.init();
+        self.my_pull_requests_component.init();
 
         self.is_running = true;
         while self.is_running {

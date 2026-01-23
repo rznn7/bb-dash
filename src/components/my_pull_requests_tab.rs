@@ -20,25 +20,25 @@ const LOADING_TEXT: &str = "...";
 pub struct MyPullRequestsTabComponent {
     my_pull_requests: ResourceState<PaginatedPullRequests>,
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
-    bitbucket_client: Option<BitbucketClient>,
-    bitbucket_repo: Option<BitbucketRepo>,
+    bitbucket_client: BitbucketClient,
+    bitbucket_repo: BitbucketRepo,
 }
 
 impl MyPullRequestsTabComponent {
-    pub fn new() -> Self {
+    pub fn new(bitbucket_client: BitbucketClient, bitbucket_repo: BitbucketRepo) -> Self {
         Self {
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
-            bitbucket_client: None,
-            bitbucket_repo: None,
+            bitbucket_client,
+            bitbucket_repo,
         }
     }
 
     fn fetch_pull_requests(&mut self) {
         self.my_pull_requests = ResourceState::Loading;
         self.my_pull_requests_fetcher = {
-            let client = self.bitbucket_client.clone().unwrap();
-            let repo = self.bitbucket_repo.clone().unwrap();
+            let client = self.bitbucket_client.clone();
+            let repo = self.bitbucket_repo.clone();
             Some(Fetcher::new(async move {
                 client.list_pull_requests(&repo, None).await
             }))
@@ -47,9 +47,7 @@ impl MyPullRequestsTabComponent {
 }
 
 impl Component for MyPullRequestsTabComponent {
-    fn init(&mut self, ctx: &ComponentContext) {
-        self.bitbucket_client = Some(ctx.client.clone());
-        self.bitbucket_repo = Some(ctx.repo.clone());
+    fn init(&mut self) {
         self.fetch_pull_requests();
     }
 

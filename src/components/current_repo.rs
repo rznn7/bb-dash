@@ -5,22 +5,22 @@ use ratatui::{
     widgets::{Paragraph, Widget},
 };
 
-use crate::components::{Component, ComponentContext};
+use crate::{bitbucket_repo::BitbucketRepo, components::Component};
 
 pub struct CurrentRepoComponent {
-    repo_slug: Option<String>,
+    repo_slug: String,
 }
 
 impl CurrentRepoComponent {
-    pub fn new() -> Self {
-        Self { repo_slug: None }
+    pub fn new(bitbucket_repo: BitbucketRepo) -> Self {
+        Self {
+            repo_slug: bitbucket_repo.slug().to_string(),
+        }
     }
 }
 
 impl Component for CurrentRepoComponent {
-    fn init(&mut self, ctx: &ComponentContext) {
-        self.repo_slug = Some(ctx.repo.slug().to_string());
-    }
+    fn init(&mut self) {}
 
     fn update(&mut self) {}
 
@@ -28,7 +28,7 @@ impl Component for CurrentRepoComponent {
 
     fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = CurrentRepoWidget {
-            repo_slug: self.repo_slug.clone().unwrap_or(String::from("?")),
+            repo_slug: self.repo_slug.clone(),
         };
         frame.render_widget(widget, area);
     }

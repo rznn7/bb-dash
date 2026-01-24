@@ -10,7 +10,7 @@ use ratatui::{
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
-    components::{Component, ComponentContext},
+    components::{Component, ComponentContext, KeyEventResponse},
     fetcher::{Fetcher, ResourceState},
     models::PaginatedPullRequests,
 };
@@ -60,9 +60,12 @@ impl Component for MyPullRequestsTabComponent {
         }
     }
 
-    fn handle_event_key(&mut self, key_event: KeyEvent) {
+    fn handle_event_key(&mut self, key_event: KeyEvent) -> KeyEventResponse {
         if let KeyCode::Char('r') = key_event.code {
-            self.fetch_pull_requests()
+            self.fetch_pull_requests();
+            KeyEventResponse::Consumed
+        } else {
+            KeyEventResponse::Ignored
         }
     }
 

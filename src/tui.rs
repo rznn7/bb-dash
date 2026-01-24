@@ -1,7 +1,7 @@
-use crate::components::Component;
 use crate::components::account_connected::AccountConnectedComponent;
 use crate::components::current_repo::CurrentRepoComponent;
 use crate::components::my_pull_requests_tab::MyPullRequestsTabComponent;
+use crate::components::{Component, KeyEventResponse};
 use crate::{bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo};
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -81,7 +81,6 @@ impl App {
     fn draw(&mut self, frame: &mut Frame) {
         let [header, main_area, footer] =
             Layout::vertical([Length(2), Min(0), Length(1)]).areas(frame.area());
-
         let tab_titles: Vec<String> = SelectedTab::iter()
             .map(|tab| format!(" {} ", tab))
             .collect();
@@ -91,7 +90,6 @@ impl App {
                 .highlight_style(Style::default().reversed().bold()),
             header,
         );
-
         match self.selected_tab {
             SelectedTab::MyPullRequests => {
                 self.my_pull_requests_component.render(frame, main_area);
@@ -103,14 +101,12 @@ impl App {
 
         let app_title_text = String::from("  bb-dash ");
         let app_title_char_count = app_title_text.chars().count() as u16;
-
         let [app_title, user_name, repo_slug] = Layout::horizontal([
             Max(app_title_char_count),
             Max(self.account_component.size()),
             Fill(1),
         ])
         .areas(footer);
-
         frame.render_widget(
             Paragraph::new(app_title_text).style(Style::default().reversed().fg(self.accent_color)),
             app_title,
@@ -120,16 +116,24 @@ impl App {
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
+        let key_event_response = match self.selected_tab {
+            SelectedTab::MyPullRequests => {
+                self.my_pull_requests_component.handle_event_key(key_event)
+            }
+            SelectedTab::NeedMyReview => KeyEventResponse::Ignored,
+        };
+
+        if let KeyEventResponse::Ignored = key_event_response {
+            self.handle_global_key_event(key_event);
+        }
+    }
+
+    fn handle_global_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.quit(),
             KeyCode::Char('l') | KeyCode::Right => self.next_tab(),
             KeyCode::Char('h') | KeyCode::Left => self.previous_tab(),
-            _ => match self.selected_tab {
-                SelectedTab::MyPullRequests => {
-                    self.my_pull_requests_component.handle_event_key(key_event)
-                }
-                SelectedTab::NeedMyReview => (),
-            },
+            _ => (),
         }
     }
 

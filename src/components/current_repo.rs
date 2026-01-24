@@ -5,7 +5,10 @@ use ratatui::{
     widgets::{Paragraph, Widget},
 };
 
-use crate::{bitbucket_repo::BitbucketRepo, components::Component};
+use crate::{
+    bitbucket_repo::BitbucketRepo,
+    components::{Component, KeyEventResponse},
+};
 
 pub struct CurrentRepoComponent {
     repo_slug: String,
@@ -24,7 +27,9 @@ impl Component for CurrentRepoComponent {
 
     fn update(&mut self) {}
 
-    fn handle_event_key(&mut self, key_event: crossterm::event::KeyEvent) {}
+    fn handle_event_key(&mut self, _key_event: crossterm::event::KeyEvent) -> KeyEventResponse {
+        KeyEventResponse::Ignored
+    }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = CurrentRepoWidget {

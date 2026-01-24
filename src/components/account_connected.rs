@@ -1,5 +1,5 @@
 use crate::bitbucket_client::BitbucketClient;
-use crate::components::Component;
+use crate::components::{Component, KeyEventResponse};
 use crate::fetcher::{Fetcher, ResourceState};
 use crate::models::Account;
 use crossterm::event::KeyEvent;
@@ -57,7 +57,9 @@ impl Component for AccountConnectedComponent {
         }
     }
 
-    fn handle_event_key(&mut self, key_event: KeyEvent) {}
+    fn handle_event_key(&mut self, _key_event: KeyEvent) -> KeyEventResponse {
+        KeyEventResponse::Ignored
+    }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = AccountConnectedWidget {

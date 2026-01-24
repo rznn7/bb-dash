@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::bitbucket_client::BitbucketClient;
 use crate::components::{Component, KeyEventResponse};
 use crate::fetcher::{Fetcher, ResourceState};
@@ -15,11 +17,11 @@ const LOADING_TEXT: &str = "...";
 pub struct AccountConnectedComponent {
     account_connected: ResourceState<Account>,
     account_connected_fetcher: Option<Fetcher<Account>>,
-    bitbucket_client: BitbucketClient,
+    bitbucket_client: Arc<BitbucketClient>,
 }
 
 impl AccountConnectedComponent {
-    pub fn new(bitbucket_client: BitbucketClient) -> Self {
+    pub fn new(bitbucket_client: Arc<BitbucketClient>) -> Self {
         Self {
             bitbucket_client,
             account_connected: ResourceState::Loading,

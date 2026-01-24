@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
@@ -10,7 +12,7 @@ use ratatui::{
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
-    components::{Component, ComponentContext, KeyEventResponse},
+    components::{Component, KeyEventResponse},
     fetcher::{Fetcher, ResourceState},
     models::PaginatedPullRequests,
 };
@@ -20,12 +22,12 @@ const LOADING_TEXT: &str = "...";
 pub struct MyPullRequestsTabComponent {
     my_pull_requests: ResourceState<PaginatedPullRequests>,
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
-    bitbucket_client: BitbucketClient,
-    bitbucket_repo: BitbucketRepo,
+    bitbucket_client: Arc<BitbucketClient>,
+    bitbucket_repo: Arc<BitbucketRepo>,
 }
 
 impl MyPullRequestsTabComponent {
-    pub fn new(bitbucket_client: BitbucketClient, bitbucket_repo: BitbucketRepo) -> Self {
+    pub fn new(bitbucket_client: Arc<BitbucketClient>, bitbucket_repo: Arc<BitbucketRepo>) -> Self {
         Self {
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,

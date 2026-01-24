@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use ratatui::{
     Frame,
     buffer::Buffer,
@@ -15,7 +17,7 @@ pub struct CurrentRepoComponent {
 }
 
 impl CurrentRepoComponent {
-    pub fn new(bitbucket_repo: BitbucketRepo) -> Self {
+    pub fn new(bitbucket_repo: Arc<BitbucketRepo>) -> Self {
         Self {
             repo_slug: bitbucket_repo.slug().to_string(),
         }

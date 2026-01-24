@@ -1,4 +1,5 @@
 use crate::components::account_connected::AccountConnectedComponent;
+use crate::components::app_title::AppTitleComponent;
 use crate::components::current_repo::CurrentRepoComponent;
 use crate::components::my_pull_requests_tab::MyPullRequestsTabComponent;
 use crate::components::{Component, KeyEventResponse};
@@ -14,6 +15,7 @@ use ratatui::{
     style::{Color, Style},
     widgets::{Paragraph, Tabs},
 };
+use std::sync::Arc;
 use std::time::Duration;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use tracing::info;
@@ -24,8 +26,9 @@ pub struct App {
     event_stream: EventStream,
     selected_tab: SelectedTab,
     repo_path: String,
-    bitbucket_repo: BitbucketRepo,
-    bitbucket_client: BitbucketClient,
+    bitbucket_repo: Arc<BitbucketRepo>,
+    bitbucket_client: Arc<BitbucketClient>,
+    app_title_component: AppTitleComponent,
     account_component: AccountConnectedComponent,
     current_repo_component: CurrentRepoComponent,
     my_pull_requests_component: MyPullRequestsTabComponent,
@@ -33,14 +36,15 @@ pub struct App {
 
 impl App {
     pub fn new(repo_path: String, accent_color: Color) -> anyhow::Result<Self> {
-        let bitbucket_repo = BitbucketRepo::new(&repo_path)?;
-        let bitbucket_client = BitbucketClient::from_env()?;
+        let bitbucket_repo = Arc::new(BitbucketRepo::new(&repo_path)?);
+        let bitbucket_client = Arc::new(BitbucketClient::from_env()?);
         Ok(Self {
             is_running: false,
             accent_color,
             event_stream: EventStream::default(),
             selected_tab: SelectedTab::default(),
             repo_path,
+            app_title_component: AppTitleComponent::new(accent_color),
             account_component: AccountConnectedComponent::new(bitbucket_client.clone()),
             current_repo_component: CurrentRepoComponent::new(bitbucket_repo.clone()),
             my_pull_requests_component: MyPullRequestsTabComponent::new(
@@ -99,18 +103,13 @@ impl App {
             }
         }
 
-        let app_title_text = String::from("  bb-dash ");
-        let app_title_char_count = app_title_text.chars().count() as u16;
         let [app_title, user_name, repo_slug] = Layout::horizontal([
-            Max(app_title_char_count),
+            Max(self.app_title_component.size()),
             Max(self.account_component.size()),
             Fill(1),
         ])
         .areas(footer);
-        frame.render_widget(
-            Paragraph::new(app_title_text).style(Style::default().reversed().fg(self.accent_color)),
-            app_title,
-        );
+        self.app_title_component.render(frame, app_title);
         self.account_component.render(frame, user_name);
         self.current_repo_component.render(frame, repo_slug);
     }

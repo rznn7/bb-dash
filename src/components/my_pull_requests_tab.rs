@@ -24,6 +24,7 @@ pub struct MyPullRequestsTabComponent {
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
     bitbucket_client: Arc<BitbucketClient>,
     bitbucket_repo: Arc<BitbucketRepo>,
+    pub selected_pr_idx: usize,
 }
 
 impl MyPullRequestsTabComponent {
@@ -33,6 +34,7 @@ impl MyPullRequestsTabComponent {
             my_pull_requests_fetcher: None,
             bitbucket_client,
             bitbucket_repo,
+            selected_pr_idx: 0,
         }
     }
 
@@ -45,6 +47,21 @@ impl MyPullRequestsTabComponent {
                 client.list_pull_requests(&repo, None).await
             }))
         };
+    }
+
+    fn select_pr_down(&mut self) {
+        if let Some(paginated_prs) = self.my_pull_requests.get()
+            && let Some(prs) = paginated_prs.values.as_ref()
+            && self.selected_pr_idx < prs.len() - 1
+        {
+            self.selected_pr_idx += 1;
+        }
+    }
+
+    fn select_pr_up(&mut self) {
+        if self.selected_pr_idx > 0 {
+            self.selected_pr_idx -= 1;
+        }
     }
 }
 
@@ -63,18 +80,27 @@ impl Component for MyPullRequestsTabComponent {
     }
 
     fn handle_event_key(&mut self, key_event: KeyEvent) -> KeyEventResponse {
-        if let KeyCode::Char('r') = key_event.code {
-            self.fetch_pull_requests();
-            KeyEventResponse::Consumed
-        } else {
-            KeyEventResponse::Ignored
+        match key_event.code {
+            KeyCode::Char('r') => {
+                self.fetch_pull_requests();
+                KeyEventResponse::Consumed
+            }
+            KeyCode::Down => {
+                self.select_pr_down();
+                KeyEventResponse::Consumed
+            }
+            KeyCode::Up => {
+                self.select_pr_up();
+                KeyEventResponse::Consumed
+            }
+            _ => KeyEventResponse::Ignored,
         }
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = MyPullRequestsTabWidget {
             pull_requests: self.my_pull_requests.get(),
-            selected_pr_idx: None,
+            selected_pr_idx: Some(self.selected_pr_idx),
         };
         frame.render_widget(widget, area);
     }

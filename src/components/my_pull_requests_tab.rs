@@ -44,7 +44,7 @@ impl MyPullRequestsTabComponent {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
             Some(Fetcher::new(async move {
-                client.list_pull_requests(&repo, None).await
+                client.list_pull_requests(&repo, None, None).await
             }))
         };
     }

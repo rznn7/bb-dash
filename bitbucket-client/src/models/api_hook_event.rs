@@ -48,6 +48,8 @@ pub enum Event {
     IssueColonCreated,
     #[serde(rename = "issue:updated")]
     IssueColonUpdated,
+    #[serde(rename = "pipeline:span_created")]
+    PipelineColonSpanCreated,
     #[serde(rename = "project:updated")]
     ProjectColonUpdated,
     #[serde(rename = "pullrequest:approved")]

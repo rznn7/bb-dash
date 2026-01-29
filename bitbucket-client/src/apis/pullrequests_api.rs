@@ -703,17 +703,21 @@ pub async fn repositories_workspace_repo_slug_pullrequests_activity_get(configur
 }
 
 /// Returns all pull requests on the specified repository.  By default only open pull requests are returned. This can be controlled using the `state` query parameter. To retrieve pull requests that are in one of multiple states, repeat the `state` parameter for each individual state.  This endpoint also supports filtering and sorting of the results. See [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering) for more details.
-pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str, state: Option<&str>) -> Result<models::ApiPaginatedPullrequests, Error<RepositoriesWorkspaceRepoSlugPullrequestsGetError>> {
+pub async fn repositories_workspace_repo_slug_pullrequests_get(configuration: &configuration::Configuration, repo_slug: &str, workspace: &str, state: Option<&str>, q: Option<&str>) -> Result<models::ApiPaginatedPullrequests, Error<RepositoriesWorkspaceRepoSlugPullrequestsGetError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_path_repo_slug = repo_slug;
     let p_path_workspace = workspace;
     let p_query_state = state;
+    let p_query_q = q;
 
     let uri_str = format!("{}/repositories/{workspace}/{repo_slug}/pullrequests", configuration.base_path, repo_slug=crate::apis::urlencode(p_path_repo_slug), workspace=crate::apis::urlencode(p_path_workspace));
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_query_state {
         req_builder = req_builder.query(&[("state", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_query_q {
+        req_builder = req_builder.query(&[("q", &param_value.to_string())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());

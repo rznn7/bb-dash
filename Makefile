@@ -1,9 +1,10 @@
 .PHONY: generate-api build run clean help
 
-# Generate Bitbucket API client from OpenAPI spec
 generate-api:
 	@echo "Downloading Bitbucket API spec..."
 	curl -s https://api.bitbucket.org/swagger.json -o bitbucket-api-oai.json
+	@echo "Patching API spec (adding missing query parameters)..."
+	@jq '.paths["/repositories/{workspace}/{repo_slug}/pullrequests"].get.parameters += [{"name": "q", "in": "query", "description": "Query string to narrow down the response as per [filtering and sorting](/cloud/bitbucket/rest/intro/#filtering).", "required": false, "type": "string"}]' bitbucket-api-oai.json > bitbucket-api-oai.json.tmp && mv bitbucket-api-oai.json.tmp bitbucket-api-oai.json
 	@echo "Generating Rust client..."
 	docker run --rm -v "$$(pwd)":/local \
 		-u $$(id -u):$$(id -g) \
@@ -12,6 +13,7 @@ generate-api:
 		-i /local/bitbucket-api-oai.json \
 		-g rust \
 		-o /local/bitbucket-client \
+		--skip-validate-spec \
 		--additional-properties=packageName=bitbucket-client \
 		--additional-properties=packageVersion=1.0.0 \
 		--additional-properties=useSerdePathToError=true \
@@ -26,21 +28,17 @@ generate-api:
 		--model-name-prefix=Api
 	@echo "✓ Client generated in ./bitbucket-client"
 
-# Build the project
 build:
 	cargo build
 
-# Run the project
 run:
 	cargo run
 
-# Clean generated files and build artifacts
 clean:
 	cargo clean
 	rm -rf bitbucket-client
 	rm -f bitbucket-api-oai.json
 
-# Show available commands
 help:
 	@echo "Available targets:"
 	@echo "  make generate-api  - Generate Bitbucket API client"

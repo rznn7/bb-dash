@@ -35,6 +35,7 @@ impl BitbucketClient {
         &self,
         bitbucket_repo: &BitbucketRepo,
         state: Option<&str>,
+        q: Option<&str>,
     ) -> Result<PaginatedPullRequests, anyhow::Error> {
         let workspace = bitbucket_repo.workspace();
         let repo_slug = bitbucket_repo.slug();
@@ -43,6 +44,7 @@ impl BitbucketClient {
             repo_slug,
             workspace,
             state,
+            q,
         )
         .await?
         .into();

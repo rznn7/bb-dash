@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use directories::ProjectDirs;
 use lazy_static::lazy_static;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{self, Layer, layer::SubscriberExt, util::SubscriberInitExt};
+use tracing_subscriber::{self, layer::SubscriberExt, util::SubscriberInitExt, Layer};
 
 lazy_static! {
     pub static ref PROJECT_NAME: String = env!("CARGO_CRATE_NAME").to_uppercase().to_string();
@@ -38,6 +38,7 @@ pub fn initialize_logging() -> anyhow::Result<()> {
         .or_else(|_| std::env::var(LOG_ENV.clone()))
         .unwrap_or_else(|_| format!("{}=trace", env!("CARGO_CRATE_NAME")));
     let file_subscriber = tracing_subscriber::fmt::layer()
+        .pretty()
         .with_file(true)
         .with_line_number(true)
         .with_writer(log_file)
@@ -49,6 +50,17 @@ pub fn initialize_logging() -> anyhow::Result<()> {
         .with(ErrorLayer::default())
         .init();
     Ok(())
+}
+
+/// Pretty-prints a value using the Debug trait with newlines and indentation.
+///
+/// Usage: `debug_pretty!(my_struct);`
+/// Output: `my_struct = MyStruct { field: value, ... }` (formatted with newlines)
+#[macro_export]
+macro_rules! debug_pretty {
+    ($val:expr) => {
+        tracing::debug!("{} = {:#?}", stringify!($val), $val);
+    };
 }
 
 /// Similar to the `std::dbg!` macro, but generates `tracing` events rather

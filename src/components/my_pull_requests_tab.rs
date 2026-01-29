@@ -5,8 +5,9 @@ use ratatui::{
     Frame,
     buffer::Buffer,
     layout::{Constraint, Rect},
-    style::{Modifier, Style},
-    widgets::{Paragraph, Row, Table, Widget},
+    style::{Color, Modifier, Style},
+    text::{Line, Span, Text},
+    widgets::{Cell, Paragraph, Row, Table, Widget},
 };
 
 use crate::{
@@ -14,7 +15,7 @@ use crate::{
     bitbucket_repo::BitbucketRepo,
     components::{Component, KeyEventResponse},
     fetcher::{Fetcher, ResourceState},
-    models::PaginatedPullRequests,
+    models::{PaginatedPullRequests, PullRequestState},
 };
 
 const LOADING_TEXT: &str = "...";
@@ -43,8 +44,9 @@ impl MyPullRequestsTabComponent {
         self.my_pull_requests_fetcher = {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
+            let q = Some("");
             Some(Fetcher::new(async move {
-                client.list_pull_requests(&repo, None, None).await
+                client.list_pull_requests(&repo, None, q).await
             }))
         };
     }
@@ -114,11 +116,6 @@ pub struct MyPullRequestsTabWidget<'a> {
 impl Widget for MyPullRequestsTabWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         if let Some(pull_requests) = self.pull_requests {
-            let mut max_length_id = 0;
-            let mut max_length_state = 0;
-            let mut max_length_title = 0;
-            let mut max_length_source_branch = 0;
-            let mut max_length_destination_branch = 0;
             let mut rows = Vec::new();
 
             for (i, pr) in pull_requests
@@ -148,32 +145,51 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                     .and_then(|d| d.branch.as_ref())
                     .map_or(String::from("?"), |b| b.name.clone());
 
-                max_length_id = max_length_id.max(id.chars().count());
-                max_length_state = max_length_state.max(state.chars().count());
-                max_length_title = max_length_title.max(title.chars().count());
-                max_length_source_branch =
-                    max_length_source_branch.max(source_branch.chars().count());
-                max_length_destination_branch =
-                    max_length_destination_branch.max(destination_branch.chars().count());
+                let selected_style = Style::new().add_modifier(Modifier::REVERSED);
+                let unselected_style = Style::default();
 
                 let row_style = self
                     .selected_pr_idx
                     .filter(|selected_idx| *selected_idx == i)
-                    .map(|_| Style::new().add_modifier(Modifier::REVERSED))
-                    .unwrap_or_default();
+                    .map(|_| selected_style)
+                    .unwrap_or(unselected_style);
 
-                let row = Row::new(vec![id, state, title, source_branch, destination_branch])
-                    .style(row_style);
+                let state_style = match pr.state {
+                    Some(PullRequestState::Open) => Style::new().bg(Color::Blue),
+                    Some(PullRequestState::Merged) => Style::new().bg(Color::Green),
+                    Some(PullRequestState::Declined) => Style::new().bg(Color::Red),
+                    Some(PullRequestState::Superseded) => Style::new().bg(Color::Gray),
+                    _ => Style::default(),
+                };
+
+                let row = Row::new(vec![
+                    Cell::from(Text::from(vec![
+                        Line::from(vec![
+                            Span::from(format!(" {state} ")).style(state_style),
+                            " ".into(),
+                            title.into(),
+                        ]),
+                        Line::from(vec!["#".into(), id.into()]),
+                    ])),
+                    Cell::from(Text::from(vec![Line::from(source_branch), Line::from("")])),
+                    Cell::from(Text::from(vec![
+                        Line::from(destination_branch),
+                        Line::from(""),
+                    ])),
+                ])
+                .style(row_style)
+                .height(2)
+                .bottom_margin(1);
 
                 rows.push(row);
             }
 
             let widths = [
-                Constraint::Length(max_length_id as u16),
-                Constraint::Length(max_length_state as u16),
-                Constraint::Length(max_length_title as u16),
-                Constraint::Length(max_length_source_branch as u16),
-                Constraint::Length(max_length_destination_branch as u16),
+                Constraint::Percentage(70),
+                Constraint::Fill(1),
+                Constraint::Fill(1),
+                Constraint::Fill(1),
+                Constraint::Fill(1),
             ];
             Table::new(rows, widths).column_spacing(1).render(area, buf);
         } else {

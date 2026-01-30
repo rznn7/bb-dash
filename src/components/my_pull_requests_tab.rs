@@ -6,7 +6,7 @@ use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Rect},
     style::{Color, Modifier, Style},
-    text::{Line, Span, Text},
+    text::{Line, Span},
     widgets::{Cell, Paragraph, Row, Table, Widget},
 };
 
@@ -116,79 +116,73 @@ pub struct MyPullRequestsTabWidget<'a> {
 impl Widget for MyPullRequestsTabWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
         if let Some(pull_requests) = self.pull_requests {
-            let mut rows = Vec::new();
+            let prs = pull_requests.values.as_deref().unwrap_or(&[]);
 
-            for (i, pr) in pull_requests
-                .values
-                .as_deref()
-                .unwrap_or(&[])
+            let mut max_id_len = 0usize;
+            let mut max_state_len = 0usize;
+
+            let labels: Vec<_> = prs
+                .iter()
+                .map(|pr| {
+                    let id_label = format!("#{}", pr.id);
+                    let state_label = pr
+                        .state
+                        .as_ref()
+                        .map_or(String::from("?"), |s| s.to_string().to_ascii_lowercase());
+                    let title_label = pr.title.as_ref().map_or(String::from("?"), |t| t.clone());
+                    let branch_label = pr
+                        .destination
+                        .as_ref()
+                        .and_then(|d| d.branch.as_ref())
+                        .map_or(String::from("?"), |b| b.name.clone());
+
+                    max_id_len = max_id_len.max(id_label.len());
+                    max_state_len = max_state_len.max(state_label.len());
+
+                    (id_label, state_label, title_label, branch_label, &pr.state)
+                })
+                .collect();
+
+            let rows: Vec<_> = labels
                 .iter()
                 .enumerate()
-            {
-                let id = pr.id.to_string();
-                let state = pr
-                    .state
-                    .as_ref()
-                    .map_or(String::from("?"), |state| state.to_string());
-                let title = pr
-                    .title
-                    .as_ref()
-                    .map_or(String::from("?"), |title| title.clone());
-                let source_branch = pr
-                    .source
-                    .as_ref()
-                    .and_then(|s| s.branch.as_ref())
-                    .map_or(String::from("?"), |b| b.name.clone());
-                let destination_branch = pr
-                    .destination
-                    .as_ref()
-                    .and_then(|d| d.branch.as_ref())
-                    .map_or(String::from("?"), |b| b.name.clone());
+                .map(
+                    |(i, (id_label, state_label, title_label, branch_label, state))| {
+                        let row_style = if self.selected_pr_idx == Some(i) {
+                            Style::new().add_modifier(Modifier::REVERSED)
+                        } else {
+                            Style::default()
+                        };
 
-                let selected_style = Style::new().add_modifier(Modifier::REVERSED);
-                let unselected_style = Style::default();
+                        let state_label_style = match state {
+                            Some(PullRequestState::Open) => Style::new().fg(Color::Blue),
+                            Some(PullRequestState::Merged) => Style::new().fg(Color::Green),
+                            Some(PullRequestState::Declined) => Style::new().fg(Color::Red),
+                            Some(PullRequestState::Superseded) => Style::new().fg(Color::Gray),
+                            _ => Style::default(),
+                        }
+                        .add_modifier(Modifier::DIM);
 
-                let row_style = self
-                    .selected_pr_idx
-                    .filter(|selected_idx| *selected_idx == i)
-                    .map(|_| selected_style)
-                    .unwrap_or(unselected_style);
-
-                let state_style = match pr.state {
-                    Some(PullRequestState::Open) => Style::new().bg(Color::Blue),
-                    Some(PullRequestState::Merged) => Style::new().bg(Color::Green),
-                    Some(PullRequestState::Declined) => Style::new().bg(Color::Red),
-                    Some(PullRequestState::Superseded) => Style::new().bg(Color::Gray),
-                    _ => Style::default(),
-                };
-
-                let row = Row::new(vec![
-                    Cell::from(Text::from(vec![
-                        Line::from(vec![
-                            Span::from(format!(" {state} ")).style(state_style),
-                            " ".into(),
-                            title.into(),
-                        ]),
-                        Line::from(vec!["#".into(), id.into()]),
-                    ])),
-                    Cell::from(Text::from(vec![Line::from(source_branch), Line::from("")])),
-                    Cell::from(Text::from(vec![
-                        Line::from(destination_branch),
-                        Line::from(""),
-                    ])),
-                ])
-                .style(row_style)
-                .height(2)
-                .bottom_margin(1);
-
-                rows.push(row);
-            }
+                        Row::new(vec![
+                            Cell::from(
+                                Span::from(id_label.as_str())
+                                    .style(Style::new().add_modifier(Modifier::DIM)),
+                            ),
+                            Cell::from(Span::from(state_label.as_str()).style(state_label_style)),
+                            Cell::from(Line::from(vec![
+                                Span::from(title_label.as_str()),
+                                Span::from(format!("  {branch_label}"))
+                                    .style(Style::new().add_modifier(Modifier::DIM)),
+                            ])),
+                        ])
+                        .style(row_style)
+                    },
+                )
+                .collect();
 
             let widths = [
-                Constraint::Percentage(70),
-                Constraint::Fill(1),
-                Constraint::Fill(1),
-                Constraint::Fill(1),
+                Constraint::Length(max_id_len as u16),
+                Constraint::Length(max_state_len as u16),
                 Constraint::Fill(1),
             ];
             Table::new(rows, widths).column_spacing(1).render(area, buf);

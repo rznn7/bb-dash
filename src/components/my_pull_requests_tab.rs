@@ -120,6 +120,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
 
             let mut max_id_len = 0usize;
             let mut max_state_len = 0usize;
+            let mut max_author_len = 0usize;
 
             let labels: Vec<_> = prs
                 .iter()
@@ -135,11 +136,24 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                         .as_ref()
                         .and_then(|d| d.branch.as_ref())
                         .map_or(String::from("?"), |b| b.name.clone());
+                    let author_label = pr
+                        .author
+                        .as_ref()
+                        .and_then(|account| account.display_name.as_ref())
+                        .map_or(String::from("?"), |display_name| display_name.clone());
 
                     max_id_len = max_id_len.max(id_label.len());
                     max_state_len = max_state_len.max(state_label.len());
+                    max_author_len = max_author_len.max(author_label.len());
 
-                    (id_label, state_label, title_label, branch_label, &pr.state)
+                    (
+                        id_label,
+                        state_label,
+                        title_label,
+                        branch_label,
+                        author_label,
+                        &pr.state,
+                    )
                 })
                 .collect();
 
@@ -147,7 +161,10 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                 .iter()
                 .enumerate()
                 .map(
-                    |(i, (id_label, state_label, title_label, branch_label, state))| {
+                    |(
+                        i,
+                        (id_label, state_label, title_label, branch_label, author_label, state),
+                    )| {
                         let row_style = if self.selected_pr_idx == Some(i) {
                             Style::new().add_modifier(Modifier::REVERSED)
                         } else {
@@ -168,6 +185,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                                 Span::from(id_label.as_str())
                                     .style(Style::new().add_modifier(Modifier::DIM)),
                             ),
+                            Cell::from(Span::from(author_label.as_str())),
                             Cell::from(Span::from(state_label.as_str()).style(state_label_style)),
                             Cell::from(Line::from(vec![
                                 Span::from(title_label.as_str()),
@@ -182,6 +200,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
 
             let widths = [
                 Constraint::Length(max_id_len as u16),
+                Constraint::Length(max_author_len as u16),
                 Constraint::Length(max_state_len as u16),
                 Constraint::Fill(1),
             ];

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use anyhow::bail;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
@@ -9,13 +10,15 @@ use ratatui::{
     text::{Line, Span},
     widgets::{Cell, Paragraph, Row, Table, Widget},
 };
+use tracing::error;
+use tracing::info;
 
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
     components::{Component, KeyEventResponse},
     fetcher::{Fetcher, ResourceState},
-    models::{PaginatedPullRequests, PullRequestState},
+    models::{PaginatedPullRequests, PullRequest, PullRequestState},
 };
 
 const LOADING_TEXT: &str = "...";
@@ -65,6 +68,31 @@ impl MyPullRequestsTabComponent {
             self.selected_pr_idx -= 1;
         }
     }
+
+    fn open_pr_in_browser(&self) {
+        if let Ok(selected_pr) = self.get_selected_pr()
+            && let Some(pr_links) = selected_pr.links.as_ref()
+            && let Some(pr_href) = pr_links.self_link.href.as_ref()
+        {
+            info!("opening {}", pr_href)
+        } else {
+            error!(
+                "could not open selected pr. self.selected_pr_idx:{}",
+                self.selected_pr_idx
+            )
+        };
+    }
+
+    fn get_selected_pr(&self) -> anyhow::Result<&PullRequest> {
+        if let Some(paginated_prs) = self.my_pull_requests.get()
+            && let Some(prs) = paginated_prs.values.as_ref()
+            && let Some(selected_pr) = prs.get(self.selected_pr_idx)
+        {
+            Ok(selected_pr)
+        } else {
+            bail!("failed to get selected_pr")
+        }
+    }
 }
 
 impl Component for MyPullRequestsTabComponent {
@@ -93,6 +121,10 @@ impl Component for MyPullRequestsTabComponent {
             }
             KeyCode::Up => {
                 self.select_pr_up();
+                KeyEventResponse::Consumed
+            }
+            KeyCode::Char('o') => {
+                self.open_pr_in_browser();
                 KeyEventResponse::Consumed
             }
             _ => KeyEventResponse::Ignored,

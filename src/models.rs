@@ -42,10 +42,10 @@ impl From<ApiAccountLinks> for AccountLinks {
     }
 }
 
-#[derive(Debug)]
-struct Link {
-    href: Option<String>,
-    name: Option<String>,
+#[derive(Debug, Deserialize)]
+pub struct Link {
+    pub href: Option<String>,
+    pub name: Option<String>,
 }
 
 impl From<ApiLink> for Link {
@@ -88,15 +88,16 @@ impl From<ApiPaginatedPullrequests> for PaginatedPullRequests {
 
 #[derive(Debug)]
 pub struct PullRequest {
-    r#type: String,
+    pub r#type: String,
     pub id: i32,
     pub title: Option<String>,
-    summary: Option<PullRequestSummary>,
+    pub summary: Option<PullRequestSummary>,
     pub state: Option<PullRequestState>,
     pub author: Option<Box<Account>>,
     pub source: Option<Box<PullRequestEndpoint>>,
     pub destination: Option<Box<PullRequestEndpoint>>,
-    merge_commit: Option<PullRequestCommit>,
+    pub merge_commit: Option<PullRequestCommit>,
+    pub links: Option<PullRequestLinks>,
 }
 
 impl TryFrom<ApiPullrequest> for PullRequest {
@@ -124,6 +125,9 @@ impl TryFrom<ApiPullrequest> for PullRequest {
                 .map(|boxed_destination| Box::new(PullRequestEndpoint::from(*boxed_destination))),
             merge_commit: api_pullrequest
                 .merge_commit
+                .and_then(|value| serde_json::from_value(value).ok()),
+            links: api_pullrequest
+                .links
                 .and_then(|value| serde_json::from_value(value).ok()),
         })
     }
@@ -207,4 +211,19 @@ pub struct PullRequestBranch {
 #[derive(Deserialize, Debug)]
 pub struct PullRequestCommit {
     hash: String,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct PullRequestLinks {
+    #[serde(rename = "self")]
+    pub self_link: Link,
+    html: Link,
+    commits: Link,
+    approve: Link,
+    diff: Link,
+    diffstat: Link,
+    comments: Link,
+    activity: Link,
+    merge: Link,
+    decline: Link,
 }

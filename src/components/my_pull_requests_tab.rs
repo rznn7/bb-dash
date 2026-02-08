@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use anyhow::bail;
+use anyhow::{Context, bail};
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
@@ -70,17 +70,18 @@ impl MyPullRequestsTabComponent {
     }
 
     fn open_pr_in_browser(&self) {
-        if let Ok(selected_pr) = self.get_selected_pr()
-            && let Some(pr_links) = selected_pr.links.as_ref()
-            && let Some(pr_href) = pr_links.self_link.href.as_ref()
+        if let Err(e) = self
+            .get_selected_pr()
+            .and_then(|pr| {
+                pr.links
+                    .as_ref()
+                    .and_then(|link| link.html.href.as_ref())
+                    .context("PR has no self link")
+            })
+            .and_then(|href_html| open::that(href_html).context("failed to open browser"))
         {
-            info!("opening {}", pr_href)
-        } else {
-            error!(
-                "could not open selected pr. self.selected_pr_idx:{}",
-                self.selected_pr_idx
-            )
-        };
+            error!("could not open selected pr: {e}");
+        }
     }
 
     fn get_selected_pr(&self) -> anyhow::Result<&PullRequest> {

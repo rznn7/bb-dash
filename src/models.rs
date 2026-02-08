@@ -216,8 +216,8 @@ pub struct PullRequestCommit {
 #[derive(Deserialize, Debug)]
 pub struct PullRequestLinks {
     #[serde(rename = "self")]
-    pub self_link: Link,
-    html: Link,
+    self_link: Link,
+    pub html: Link,
     commits: Link,
     approve: Link,
     diff: Link,

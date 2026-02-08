@@ -3,6 +3,7 @@ use crate::components::app_title::AppTitleComponent;
 use crate::components::current_repo::CurrentRepoComponent;
 use crate::components::my_pull_requests_tab::MyPullRequestsTabComponent;
 use crate::components::{Component, KeyEventResponse};
+use crate::models::Account;
 use crate::{bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo};
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
 use futures::StreamExt;
@@ -25,7 +26,6 @@ pub struct App {
     accent_color: Color,
     event_stream: EventStream,
     selected_tab: SelectedTab,
-    repo_path: String,
     bitbucket_repo: Arc<BitbucketRepo>,
     bitbucket_client: Arc<BitbucketClient>,
     app_title_component: AppTitleComponent,
@@ -35,37 +35,39 @@ pub struct App {
 }
 
 impl App {
-    pub fn new(repo_path: String, accent_color: Color) -> anyhow::Result<Self> {
-        let bitbucket_repo = Arc::new(BitbucketRepo::new(&repo_path)?);
-        let bitbucket_client = Arc::new(BitbucketClient::from_env()?);
-        Ok(Self {
+    pub fn new(
+        bitbucket_client: Arc<BitbucketClient>,
+        bitbucket_repo: Arc<BitbucketRepo>,
+        account: Account,
+        accent_color: Color,
+    ) -> Self {
+        let user_uuid = account.uuid.clone().unwrap_or_default();
+        Self {
             is_running: false,
             accent_color,
             event_stream: EventStream::default(),
             selected_tab: SelectedTab::default(),
-            repo_path,
             app_title_component: AppTitleComponent::new(accent_color),
-            account_component: AccountConnectedComponent::new(bitbucket_client.clone()),
+            account_component: AccountConnectedComponent::new(account),
             current_repo_component: CurrentRepoComponent::new(bitbucket_repo.clone()),
             my_pull_requests_component: MyPullRequestsTabComponent::new(
                 bitbucket_client.clone(),
                 bitbucket_repo.clone(),
+                user_uuid,
             ),
             bitbucket_repo,
             bitbucket_client,
-        })
+        }
     }
 
     pub async fn run(mut self, mut terminal: DefaultTerminal) -> Result<(), anyhow::Error> {
         info!("start running");
         let mut interval = get_app_interval();
-        self.account_component.init();
         self.current_repo_component.init();
         self.my_pull_requests_component.init();
 
         self.is_running = true;
         while self.is_running {
-            self.account_component.update();
             self.my_pull_requests_component.update();
 
             tokio::select! {

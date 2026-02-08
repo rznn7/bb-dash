@@ -11,7 +11,6 @@ use ratatui::{
     widgets::{Cell, Paragraph, Row, Table, Widget},
 };
 use tracing::error;
-use tracing::info;
 
 use crate::{
     bitbucket_client::BitbucketClient,
@@ -28,16 +27,22 @@ pub struct MyPullRequestsTabComponent {
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
     bitbucket_client: Arc<BitbucketClient>,
     bitbucket_repo: Arc<BitbucketRepo>,
-    pub selected_pr_idx: usize,
+    user_uuid: String,
+    selected_pr_idx: usize,
 }
 
 impl MyPullRequestsTabComponent {
-    pub fn new(bitbucket_client: Arc<BitbucketClient>, bitbucket_repo: Arc<BitbucketRepo>) -> Self {
+    pub fn new(
+        bitbucket_client: Arc<BitbucketClient>,
+        bitbucket_repo: Arc<BitbucketRepo>,
+        user_uuid: String,
+    ) -> Self {
         Self {
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
             bitbucket_client,
             bitbucket_repo,
+            user_uuid,
             selected_pr_idx: 0,
         }
     }
@@ -47,9 +52,10 @@ impl MyPullRequestsTabComponent {
         self.my_pull_requests_fetcher = {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
-            let q = Some("");
+            let user_uuid = self.user_uuid.clone();
+            let q = format!("author.uuid = \"{user_uuid}\" AND state = \"open\"");
             Some(Fetcher::new(async move {
-                client.list_pull_requests(&repo, None, q).await
+                client.list_pull_requests(&repo, None, Some(&q)).await
             }))
         };
     }

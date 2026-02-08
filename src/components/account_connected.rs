@@ -1,8 +1,4 @@
-use std::sync::Arc;
-
-use crate::bitbucket_client::BitbucketClient;
 use crate::components::{Component, KeyEventResponse};
-use crate::fetcher::{Fetcher, ResourceState};
 use crate::models::Account;
 use crossterm::event::KeyEvent;
 use ratatui::Frame;
@@ -12,52 +8,27 @@ use ratatui::style::Style;
 use ratatui::widgets::Paragraph;
 use ratatui::widgets::Widget;
 
-const LOADING_TEXT: &str = "...";
-
 pub struct AccountConnectedComponent {
-    account_connected: ResourceState<Account>,
-    account_connected_fetcher: Option<Fetcher<Account>>,
-    bitbucket_client: Arc<BitbucketClient>,
+    account: Account,
 }
 
 impl AccountConnectedComponent {
-    pub fn new(bitbucket_client: Arc<BitbucketClient>) -> Self {
-        Self {
-            bitbucket_client,
-            account_connected: ResourceState::Loading,
-            account_connected_fetcher: None,
-        }
+    pub fn new(account: Account) -> Self {
+        Self { account }
     }
 
     pub fn size(&self) -> u16 {
         AccountConnectedWidget {
-            account: self.account_connected.get(),
+            account: &self.account,
         }
         .size()
-    }
-
-    fn fetch_account(&mut self) {
-        self.account_connected = ResourceState::Loading;
-        self.account_connected_fetcher = {
-            let client = self.bitbucket_client.clone();
-            Some(Fetcher::new(async move { client.get_user().await }))
-        };
     }
 }
 
 impl Component for AccountConnectedComponent {
-    fn init(&mut self) {
-        self.fetch_account();
-    }
+    fn init(&mut self) {}
 
-    fn update(&mut self) {
-        if let ResourceState::Loading = self.account_connected
-            && let Some(account_connected_fetcher) = self.account_connected_fetcher.as_mut()
-            && let Some(account) = account_connected_fetcher.try_get()
-        {
-            self.account_connected = ResourceState::Loaded(account);
-        }
-    }
+    fn update(&mut self) {}
 
     fn handle_event_key(&mut self, _key_event: KeyEvent) -> KeyEventResponse {
         KeyEventResponse::Ignored
@@ -65,25 +36,25 @@ impl Component for AccountConnectedComponent {
 
     fn render(&self, frame: &mut Frame, area: Rect) {
         let widget = AccountConnectedWidget {
-            account: self.account_connected.get(),
+            account: &self.account,
         };
         frame.render_widget(widget, area);
     }
 }
 
 pub struct AccountConnectedWidget<'a> {
-    pub account: Option<&'a Account>,
+    pub account: &'a Account,
 }
 
 impl AccountConnectedWidget<'_> {
     fn formatted_text(&self) -> String {
         let name = self
             .account
-            .as_ref()
-            .and_then(|account| account.display_name.as_deref())
-            .unwrap_or(LOADING_TEXT);
+            .display_name
+            .as_deref()
+            .unwrap_or("unknown");
 
-        format!("  {} ", name)
+        format!("  {} ", name)
     }
 
     pub fn size(&self) -> u16 {

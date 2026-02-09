@@ -138,6 +138,18 @@ pub enum ApiObject {
     #[serde(rename="pipeline_ref_target")]
     ApiPipelineRefTarget {
     },
+    #[serde(rename="pipeline_runner")]
+    ApiPipelineRunner {
+    },
+    #[serde(rename="pipeline_runner_oauth_client")]
+    ApiPipelineRunnerOauthClient {
+    },
+    #[serde(rename="pipeline_runner_state")]
+    ApiPipelineRunnerState {
+    },
+    #[serde(rename="pipeline_runner_version")]
+    ApiPipelineRunnerVersion {
+    },
     #[serde(rename="pipeline_schedule")]
     ApiPipelineSchedule {
     },

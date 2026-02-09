@@ -73,6 +73,7 @@ docs/ApiPaginatedLogEntries.md
 docs/ApiPaginatedMilestones.md
 docs/ApiPaginatedPipelineCaches.md
 docs/ApiPaginatedPipelineKnownHosts.md
+docs/ApiPaginatedPipelineRunners.md
 docs/ApiPaginatedPipelineScheduleExecutions.md
 docs/ApiPaginatedPipelineSchedules.md
 docs/ApiPaginatedPipelineSteps.md
@@ -114,6 +115,10 @@ docs/ApiPipelineError.md
 docs/ApiPipelineImage.md
 docs/ApiPipelineKnownHost.md
 docs/ApiPipelineRefTarget.md
+docs/ApiPipelineRunner.md
+docs/ApiPipelineRunnerOauthClient.md
+docs/ApiPipelineRunnerState.md
+docs/ApiPipelineRunnerVersion.md
 docs/ApiPipelineSchedule.md
 docs/ApiPipelineScheduleExecution.md
 docs/ApiPipelineScheduleExecutionErrored.md
@@ -285,6 +290,7 @@ src/models/api_paginated_log_entries.rs
 src/models/api_paginated_milestones.rs
 src/models/api_paginated_pipeline_caches.rs
 src/models/api_paginated_pipeline_known_hosts.rs
+src/models/api_paginated_pipeline_runners.rs
 src/models/api_paginated_pipeline_schedule_executions.rs
 src/models/api_paginated_pipeline_schedules.rs
 src/models/api_paginated_pipeline_steps.rs
@@ -326,6 +332,10 @@ src/models/api_pipeline_error.rs
 src/models/api_pipeline_image.rs
 src/models/api_pipeline_known_host.rs
 src/models/api_pipeline_ref_target.rs
+src/models/api_pipeline_runner.rs
+src/models/api_pipeline_runner_oauth_client.rs
+src/models/api_pipeline_runner_state.rs
+src/models/api_pipeline_runner_version.rs
 src/models/api_pipeline_schedule.rs
 src/models/api_pipeline_schedule_execution.rs
 src/models/api_pipeline_schedule_execution_errored.rs

@@ -13,10 +13,10 @@ serde_json = "^1.0"
 serde_repr = "^0.1"
 serde_path_to_error = "^0.1"
 url = "^2.5"
-reqwest = { version = "^0.12", default-features = false, features = ["json", "multipart"] }
-reqwest-middleware = { version = "^0.4", features = ["json", "multipart"] }
+reqwest = { version = "^0.13", default-features = false, features = ["json", "multipart", "query", "form"] }
+reqwest-middleware = { version = "^0.5", features = ["json", "multipart", "query", "form"] }
 
 [features]
-default = ["rustls-tls"]
+default = ["rustls"]
 native-tls = ["reqwest/native-tls"]
-rustls-tls = ["reqwest/rustls-tls"]
+rustls = ["reqwest/rustls"]

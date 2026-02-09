@@ -17,12 +17,9 @@ pub struct ApiCommitstatus {
     pub r#type: String,
     #[serde(rename = "links", skip_serializing_if = "Option::is_none")]
     pub links: Option<serde_json::Value>,
-    /// The commit status' id.
-    #[serde(rename = "uuid", skip_serializing_if = "Option::is_none")]
-    pub uuid: Option<String>,
     /// An identifier for the status that's unique to         its type (current \"build\" is the only supported type) and the vendor,         e.g. BB-DEPLOY
-    #[serde(rename = "key", skip_serializing_if = "Option::is_none")]
-    pub key: Option<String>,
+    #[serde(rename = "key")]
+    pub key: String,
     ///  The name of the ref that pointed to this commit at the time the status object was created. Note that this the ref may since have moved off of the commit. This optional field can be useful for build systems whose build triggers and configuration are branch-dependent (e.g. a Pipeline build). It is legitimate for this field to not be set, or even apply (e.g. a static linting job).
     #[serde(rename = "refname", skip_serializing_if = "Option::is_none")]
     pub refname: Option<String>,
@@ -30,8 +27,8 @@ pub struct ApiCommitstatus {
     #[serde(rename = "url", skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
     /// Provides some indication of the status of this commit
-    #[serde(rename = "state", skip_serializing_if = "Option::is_none")]
-    pub state: Option<State>,
+    #[serde(rename = "state")]
+    pub state: State,
     /// An identifier for the build itself, e.g. BB-DEPLOY-1
     #[serde(rename = "name", skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
@@ -45,15 +42,14 @@ pub struct ApiCommitstatus {
 }
 
 impl ApiCommitstatus {
-    pub fn new(r#type: String) -> ApiCommitstatus {
+    pub fn new(r#type: String, key: String, state: State) -> ApiCommitstatus {
         ApiCommitstatus {
             r#type,
             links: None,
-            uuid: None,
-            key: None,
+            key,
             refname: None,
             url: None,
-            state: None,
+            state,
             name: None,
             description: None,
             created_on: None,

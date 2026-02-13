@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use anyhow::{Context, bail};
+use arboard::Clipboard;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
@@ -29,6 +30,7 @@ pub struct MyPullRequestsTabComponent {
     bitbucket_repo: Arc<BitbucketRepo>,
     user_uuid: String,
     selected_pr_idx: usize,
+    clipboard: Clipboard,
 }
 
 impl MyPullRequestsTabComponent {
@@ -44,6 +46,7 @@ impl MyPullRequestsTabComponent {
             bitbucket_repo,
             user_uuid,
             selected_pr_idx: 0,
+            clipboard: Clipboard::new().expect("failed to create Clipboard instance"),
         }
     }
 
@@ -75,6 +78,29 @@ impl MyPullRequestsTabComponent {
         }
     }
 
+    fn copy_pr_link_to_clipboard(&mut self) {
+        let href = match self.get_selected_pr() {
+            Ok(pr) => pr
+                .links
+                .as_ref()
+                .and_then(|link| link.html.href.as_ref())
+                .cloned(),
+            Err(e) => {
+                error!("could not get selected pr: {e}");
+                return;
+            }
+        };
+
+        let Some(href) = href else {
+            error!("PR has no html link");
+            return;
+        };
+
+        if let Err(e) = self.clipboard.set_text(href) {
+            error!("failed to copy pr link to clipboard: {e}");
+        }
+    }
+
     fn open_pr_in_browser(&self) {
         if let Err(e) = self
             .get_selected_pr()
@@ -82,7 +108,7 @@ impl MyPullRequestsTabComponent {
                 pr.links
                     .as_ref()
                     .and_then(|link| link.html.href.as_ref())
-                    .context("PR has no self link")
+                    .context("PR has no html link")
             })
             .and_then(|href_html| open::that(href_html).context("failed to open browser"))
         {
@@ -132,6 +158,10 @@ impl Component for MyPullRequestsTabComponent {
             }
             KeyCode::Char('o') => {
                 self.open_pr_in_browser();
+                KeyEventResponse::Consumed
+            }
+            KeyCode::Char('y') => {
+                self.copy_pr_link_to_clipboard();
                 KeyEventResponse::Consumed
             }
             _ => KeyEventResponse::Ignored,

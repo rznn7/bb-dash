@@ -55,8 +55,9 @@ impl MyPullRequestsTabComponent {
         self.my_pull_requests_fetcher = {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
-            let user_uuid = self.user_uuid.clone();
-            let q = format!("author.uuid = \"{user_uuid}\" AND state = \"open\"");
+            // (no filtering for now)
+            // let q = format!("author.uuid = \"{}\" AND state = \"open\"", self.user_uuid);
+            let q = String::new();
             Some(Fetcher::new(async move {
                 client.list_pull_requests(&repo, None, Some(&q)).await
             }))

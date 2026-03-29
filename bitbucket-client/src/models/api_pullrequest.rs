@@ -106,6 +106,10 @@ impl ApiPullrequest {
 pub enum State {
     #[serde(rename = "OPEN")]
     Open,
+    #[serde(rename = "DRAFT")]
+    Draft,
+    #[serde(rename = "QUEUED")]
+    Queued,
     #[serde(rename = "MERGED")]
     Merged,
     #[serde(rename = "DECLINED")]

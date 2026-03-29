@@ -139,6 +139,8 @@ pub enum PullRequestState {
     Merged,
     Declined,
     Superseded,
+    Draft,
+    Queued,
 }
 
 impl From<State> for PullRequestState {
@@ -148,6 +150,8 @@ impl From<State> for PullRequestState {
             State::Merged => PullRequestState::Merged,
             State::Declined => PullRequestState::Declined,
             State::Superseded => PullRequestState::Superseded,
+            State::Draft => PullRequestState::Draft,
+            State::Queued => PullRequestState::Queued,
         }
     }
 }

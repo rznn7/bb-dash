@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **title** | Option<**String**> | Title of the pull request. | [optional]
 **rendered** | Option<**serde_json::Value**> | User provided pull request text, interpreted in a markup language and rendered in HTML | [optional]
 **summary** | Option<**serde_json::Value**> |  | [optional]
-**state** | Option<**State**> | The pull request's current status. (enum: OPEN, MERGED, DECLINED, SUPERSEDED) | [optional]
+**state** | Option<**State**> | The pull request's current status. (enum: OPEN, DRAFT, QUEUED, MERGED, DECLINED, SUPERSEDED) | [optional]
 **author** | Option<[**models::ApiAccount**](Account.md)> |  | [optional]
 **source** | Option<[**models::ApiPullrequestEndpoint**](PullrequestEndpoint.md)> |  | [optional]
 **destination** | Option<[**models::ApiPullrequestEndpoint**](PullrequestEndpoint.md)> |  | [optional]

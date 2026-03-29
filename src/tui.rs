@@ -1,8 +1,9 @@
 use crate::components::account_connected::AccountConnectedComponent;
 use crate::components::app_title::AppTitleComponent;
 use crate::components::current_repo::CurrentRepoComponent;
+use crate::components::help_popup::HelpPopupComponent;
 use crate::components::my_pull_requests_tab::MyPullRequestsTabComponent;
-use crate::components::{Component, KeyEventResponse};
+use crate::components::{Component, KeyBinding, KeyEventResponse};
 use crate::models::Account;
 use crate::{bitbucket_client::BitbucketClient, bitbucket_repo::BitbucketRepo};
 use crossterm::event::{Event, EventStream, KeyCode, KeyEvent};
@@ -32,6 +33,7 @@ pub struct App {
     account_component: AccountConnectedComponent,
     current_repo_component: CurrentRepoComponent,
     my_pull_requests_component: MyPullRequestsTabComponent,
+    help_popup: Option<HelpPopupComponent>,
 }
 
 impl App {
@@ -57,6 +59,7 @@ impl App {
             ),
             bitbucket_repo,
             bitbucket_client,
+            help_popup: None,
         }
     }
 
@@ -114,9 +117,37 @@ impl App {
         self.app_title_component.render(frame, app_title);
         self.account_component.render(frame, user_name);
         self.current_repo_component.render(frame, repo_slug);
+
+        if let Some(help_popup) = &self.help_popup {
+            help_popup.render(frame, frame.area());
+        }
     }
 
     fn handle_key_event(&mut self, key_event: KeyEvent) {
+        if let Some(help_popup) = &mut self.help_popup {
+            match help_popup.handle_event_key(key_event) {
+                KeyEventResponse::Consumed => return,
+                KeyEventResponse::Ignored => {
+                    self.help_popup = None;
+                    return;
+                }
+            }
+        }
+
+        if key_event.code == KeyCode::Char('?') {
+            let tab_keybindings = match self.selected_tab {
+                SelectedTab::MyPullRequests => self.my_pull_requests_component.keybindings(),
+                SelectedTab::NeedMyReview => vec![],
+            };
+            let tab_name = format!("{}", self.selected_tab);
+            self.help_popup = Some(HelpPopupComponent::new(
+                Self::global_keybindings(),
+                tab_keybindings,
+                tab_name,
+            ));
+            return;
+        }
+
         let key_event_response = match self.selected_tab {
             SelectedTab::MyPullRequests => {
                 self.my_pull_requests_component.handle_event_key(key_event)
@@ -144,6 +175,15 @@ impl App {
 
     pub fn previous_tab(&mut self) {
         self.selected_tab = self.selected_tab.previous();
+    }
+
+    fn global_keybindings() -> Vec<KeyBinding> {
+        vec![
+            KeyBinding { key: "?", description: "Toggle help" },
+            KeyBinding { key: "q", description: "Quit" },
+            KeyBinding { key: "h / Left", description: "Previous tab" },
+            KeyBinding { key: "l / Right", description: "Next tab" },
+        ]
     }
 
     fn quit(&mut self) {

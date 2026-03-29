@@ -16,7 +16,7 @@ use tracing::error;
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
-    components::{Component, KeyEventResponse},
+    components::{Component, KeyBinding, KeyEventResponse},
     fetcher::{Fetcher, ResourceState},
     models::{PaginatedPullRequests, PullRequest, PullRequestState},
 };
@@ -167,6 +167,16 @@ impl Component for MyPullRequestsTabComponent {
             }
             _ => KeyEventResponse::Ignored,
         }
+    }
+
+    fn keybindings(&self) -> Vec<KeyBinding> {
+        vec![
+            KeyBinding { key: "r", description: "Refresh pull requests" },
+            KeyBinding { key: "Down", description: "Select next PR" },
+            KeyBinding { key: "Up", description: "Select previous PR" },
+            KeyBinding { key: "o", description: "Open PR in browser" },
+            KeyBinding { key: "y", description: "Copy PR link" },
+        ]
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {

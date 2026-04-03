@@ -126,20 +126,6 @@ impl Widget for HelpPopupWidget<'_> {
 
         let mut lines: Vec<Line> = Vec::new();
 
-        // Global section
-        lines.push(Line::styled(
-            " Global",
-            Style::default().add_modifier(Modifier::UNDERLINED),
-        ));
-        for kb in self.global_keybindings {
-            if Self::matches_filter(kb, self.filter_text) {
-                lines.push(Self::keybinding_line(kb));
-            }
-        }
-
-        lines.push(Line::raw(""));
-
-        // Tab section
         lines.push(Line::styled(
             format!(" {}", self.tab_name),
             Style::default().add_modifier(Modifier::UNDERLINED),
@@ -152,7 +138,18 @@ impl Widget for HelpPopupWidget<'_> {
 
         lines.push(Line::raw(""));
 
-        // Filter input line
+        lines.push(Line::styled(
+            " Global",
+            Style::default().add_modifier(Modifier::UNDERLINED),
+        ));
+        for kb in self.global_keybindings {
+            if Self::matches_filter(kb, self.filter_text) {
+                lines.push(Self::keybinding_line(kb));
+            }
+        }
+
+        lines.push(Line::raw(""));
+
         if self.is_filtering {
             lines.push(Line::from(vec![
                 Span::styled(" / ", Style::default().add_modifier(Modifier::DIM)),

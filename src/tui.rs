@@ -179,10 +179,22 @@ impl App {
 
     fn global_keybindings() -> Vec<KeyBinding> {
         vec![
-            KeyBinding { key: "?", description: "Toggle help" },
-            KeyBinding { key: "q", description: "Quit" },
-            KeyBinding { key: "h / Left", description: "Previous tab" },
-            KeyBinding { key: "l / Right", description: "Next tab" },
+            KeyBinding {
+                key: "?",
+                description: "Toggle help",
+            },
+            KeyBinding {
+                key: "q",
+                description: "Quit",
+            },
+            KeyBinding {
+                key: "h / Left",
+                description: "Previous tab",
+            },
+            KeyBinding {
+                key: "l / Right",
+                description: "Next tab",
+            },
         ]
     }
 

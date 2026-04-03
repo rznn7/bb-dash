@@ -16,7 +16,7 @@ use tracing::error;
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
-    components::{Component, KeyBinding, KeyEventResponse},
+    components::{Component, KeyBinding, KeyEventResponse, pr_detail::PrDetailComponent},
     fetcher::{Fetcher, ResourceState},
     models::{PaginatedPullRequests, PullRequest, PullRequestState},
 };
@@ -31,6 +31,7 @@ pub struct MyPullRequestsTabComponent {
     user_uuid: String,
     selected_pr_idx: usize,
     clipboard: Clipboard,
+    pr_detail: Option<PrDetailComponent>,
 }
 
 impl MyPullRequestsTabComponent {
@@ -47,6 +48,7 @@ impl MyPullRequestsTabComponent {
             user_uuid,
             selected_pr_idx: 0,
             clipboard: Clipboard::new().expect("failed to create Clipboard instance"),
+            pr_detail: None,
         }
     }
 
@@ -117,6 +119,18 @@ impl MyPullRequestsTabComponent {
         }
     }
 
+    fn open_pr_detail(&mut self) {
+        if let Ok(pr) = self.get_selected_pr() {
+            let mut detail = PrDetailComponent::new(
+                pr.clone(),
+                self.bitbucket_client.clone(),
+                self.bitbucket_repo.clone(),
+            );
+            detail.init();
+            self.pr_detail = Some(detail);
+        }
+    }
+
     fn get_selected_pr(&self) -> anyhow::Result<&PullRequest> {
         if let Some(paginated_prs) = self.my_pull_requests.get()
             && let Some(prs) = paginated_prs.values.as_ref()
@@ -135,6 +149,10 @@ impl Component for MyPullRequestsTabComponent {
     }
 
     fn update(&mut self) {
+        if let Some(detail) = self.pr_detail.as_mut() {
+            detail.update();
+            return;
+        }
         if let ResourceState::Loading = self.my_pull_requests
             && let Some(pr_fetcher) = self.my_pull_requests_fetcher.as_mut()
             && let Some(pr) = pr_fetcher.try_get()
@@ -144,6 +162,16 @@ impl Component for MyPullRequestsTabComponent {
     }
 
     fn handle_event_key(&mut self, key_event: KeyEvent) -> KeyEventResponse {
+        if let Some(detail) = self.pr_detail.as_mut() {
+            return match detail.handle_event_key(key_event) {
+                KeyEventResponse::Consumed => KeyEventResponse::Consumed,
+                KeyEventResponse::Ignored => {
+                    self.pr_detail = None;
+                    KeyEventResponse::Consumed
+                }
+            };
+        }
+
         match key_event.code {
             KeyCode::Char('r') => {
                 self.fetch_pull_requests();
@@ -165,21 +193,51 @@ impl Component for MyPullRequestsTabComponent {
                 self.copy_pr_link_to_clipboard();
                 KeyEventResponse::Consumed
             }
+            KeyCode::Enter => {
+                self.open_pr_detail();
+                KeyEventResponse::Consumed
+            }
             _ => KeyEventResponse::Ignored,
         }
     }
 
     fn keybindings(&self) -> Vec<KeyBinding> {
+        if let Some(detail) = &self.pr_detail {
+            return detail.keybindings();
+        }
         vec![
-            KeyBinding { key: "r", description: "Refresh pull requests" },
-            KeyBinding { key: "Down", description: "Select next PR" },
-            KeyBinding { key: "Up", description: "Select previous PR" },
-            KeyBinding { key: "o", description: "Open PR in browser" },
-            KeyBinding { key: "y", description: "Copy PR link" },
+            KeyBinding {
+                key: "Enter",
+                description: "View PR details",
+            },
+            KeyBinding {
+                key: "r",
+                description: "Refresh pull requests",
+            },
+            KeyBinding {
+                key: "Down",
+                description: "Select next PR",
+            },
+            KeyBinding {
+                key: "Up",
+                description: "Select previous PR",
+            },
+            KeyBinding {
+                key: "o",
+                description: "Open PR in browser",
+            },
+            KeyBinding {
+                key: "y",
+                description: "Copy PR link",
+            },
         ]
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
+        if let Some(detail) = &self.pr_detail {
+            detail.render(frame, area);
+            return;
+        }
         let widget = MyPullRequestsTabWidget {
             pull_requests: self.my_pull_requests.get(),
             selected_pr_idx: Some(self.selected_pr_idx),

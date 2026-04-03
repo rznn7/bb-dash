@@ -1,14 +1,14 @@
 use anyhow::{self};
 use bitbucket_client::models::{ApiAccount, ApiAccountLinks, ApiLink};
 use bitbucket_client::models::{
-    ApiPaginatedPullrequests, ApiPullrequest, ApiPullrequestEndpoint, ApiRepository,
-    api_pullrequest::State,
+    ApiCommitstatus, ApiPaginatedCommitstatuses, ApiPaginatedPullrequests, ApiParticipant,
+    ApiPullrequest, ApiPullrequestEndpoint, ApiRepository, api_pullrequest::State,
 };
 use serde::Deserialize;
 use strum::Display;
 use tracing::warn;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Account {
     pub r#type: String,
     pub links: Option<AccountLinks>,
@@ -27,7 +27,7 @@ impl From<ApiAccount> for Account {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct AccountLinks {
     avatar: Option<Box<Link>>,
 }
@@ -42,7 +42,7 @@ impl From<ApiAccountLinks> for AccountLinks {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize)]
 pub struct Link {
     pub href: Option<String>,
     pub name: Option<String>,
@@ -86,7 +86,7 @@ impl From<ApiPaginatedPullrequests> for PaginatedPullRequests {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PullRequest {
     pub r#type: String,
     pub id: i32,
@@ -98,6 +98,9 @@ pub struct PullRequest {
     pub destination: Option<Box<PullRequestEndpoint>>,
     pub merge_commit: Option<PullRequestCommit>,
     pub links: Option<PullRequestLinks>,
+    pub participants: Vec<Participant>,
+    pub created_on: Option<String>,
+    pub updated_on: Option<String>,
 }
 
 impl TryFrom<ApiPullrequest> for PullRequest {
@@ -129,11 +132,19 @@ impl TryFrom<ApiPullrequest> for PullRequest {
             links: api_pullrequest
                 .links
                 .and_then(|value| serde_json::from_value(value).ok()),
+            participants: api_pullrequest
+                .participants
+                .unwrap_or_default()
+                .into_iter()
+                .map(Participant::from)
+                .collect(),
+            created_on: api_pullrequest.created_on,
+            updated_on: api_pullrequest.updated_on,
         })
     }
 }
 
-#[derive(Debug, Display)]
+#[derive(Debug, Clone, Display)]
 pub enum PullRequestState {
     Open,
     Merged,
@@ -156,14 +167,14 @@ impl From<State> for PullRequestState {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct PullRequestSummary {
-    raw: Option<String>,
+    pub raw: Option<String>,
     markup: Option<String>,
     html: Option<String>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PullRequestEndpoint {
     repository: Option<Box<Repository>>,
     pub branch: Option<PullRequestBranch>,
@@ -186,7 +197,7 @@ impl From<ApiPullrequestEndpoint> for PullRequestEndpoint {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Repository {
     r#type: String,
     uuid: String,
@@ -207,17 +218,17 @@ impl From<ApiRepository> for Repository {
     }
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct PullRequestBranch {
     pub name: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct PullRequestCommit {
     hash: String,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct PullRequestLinks {
     #[serde(rename = "self")]
     self_link: Link,
@@ -230,4 +241,116 @@ pub struct PullRequestLinks {
     activity: Link,
     merge: Link,
     decline: Link,
+}
+
+#[derive(Debug, Clone)]
+pub struct Participant {
+    pub user: Option<Box<Account>>,
+    pub role: Option<ParticipantRole>,
+    pub approved: Option<bool>,
+    pub state: Option<ParticipantState>,
+}
+
+impl From<ApiParticipant> for Participant {
+    fn from(api: ApiParticipant) -> Self {
+        Self {
+            user: api
+                .user
+                .map(|boxed| Box::new(Account::from(*boxed))),
+            role: api.role.map(Into::into),
+            approved: api.approved,
+            state: api.state.map(Into::into),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ParticipantRole {
+    Participant,
+    Reviewer,
+}
+
+impl From<bitbucket_client::models::api_participant::Role> for ParticipantRole {
+    fn from(role: bitbucket_client::models::api_participant::Role) -> Self {
+        use bitbucket_client::models::api_participant::Role;
+        match role {
+            Role::Participant => ParticipantRole::Participant,
+            Role::Reviewer => ParticipantRole::Reviewer,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum ParticipantState {
+    Approved,
+    ChangesRequested,
+}
+
+impl From<bitbucket_client::models::api_participant::State> for ParticipantState {
+    fn from(state: bitbucket_client::models::api_participant::State) -> Self {
+        use bitbucket_client::models::api_participant::State;
+        match state {
+            State::Approved => ParticipantState::Approved,
+            State::ChangesRequested => ParticipantState::ChangesRequested,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct CommitStatus {
+    pub key: String,
+    pub state: CommitStatusState,
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub url: Option<String>,
+}
+
+impl From<ApiCommitstatus> for CommitStatus {
+    fn from(api: ApiCommitstatus) -> Self {
+        Self {
+            key: api.key,
+            state: api.state.into(),
+            name: api.name,
+            description: api.description,
+            url: api.url,
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+pub enum CommitStatusState {
+    Failed,
+    InProgress,
+    Stopped,
+    Successful,
+}
+
+impl From<bitbucket_client::models::api_commitstatus::State> for CommitStatusState {
+    fn from(state: bitbucket_client::models::api_commitstatus::State) -> Self {
+        use bitbucket_client::models::api_commitstatus::State;
+        match state {
+            State::Failed => CommitStatusState::Failed,
+            State::Inprogress => CommitStatusState::InProgress,
+            State::Stopped => CommitStatusState::Stopped,
+            State::Successful => CommitStatusState::Successful,
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct PaginatedCommitStatuses {
+    pub values: Vec<CommitStatus>,
+}
+
+impl From<ApiPaginatedCommitstatuses> for PaginatedCommitStatuses {
+    fn from(api: ApiPaginatedCommitstatuses) -> Self {
+        Self {
+            values: api
+                .values
+                .unwrap_or_default()
+                .into_iter()
+                .map(CommitStatus::from)
+                .collect(),
+        }
+    }
 }

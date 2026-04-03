@@ -1,11 +1,16 @@
 use bitbucket_client::apis::{
     configuration::Configuration,
-    pullrequests_api::repositories_workspace_repo_slug_pullrequests_get, users_api::user_get,
+    pullrequests_api::{
+        repositories_workspace_repo_slug_pullrequests_get,
+        repositories_workspace_repo_slug_pullrequests_pull_request_id_get,
+        repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get,
+    },
+    users_api::user_get,
 };
 
 use crate::{
     bitbucket_repo::BitbucketRepo,
-    models::{Account, PaginatedPullRequests},
+    models::{Account, PaginatedCommitStatuses, PaginatedPullRequests, PullRequest},
 };
 
 #[derive(Clone, Debug)]
@@ -50,5 +55,37 @@ impl BitbucketClient {
         .into();
 
         Ok(pull_requests)
+    }
+
+    pub async fn get_pull_request(
+        &self,
+        bitbucket_repo: &BitbucketRepo,
+        pr_id: i32,
+    ) -> Result<PullRequest, anyhow::Error> {
+        let pr = repositories_workspace_repo_slug_pullrequests_pull_request_id_get(
+            &self.configuration,
+            pr_id,
+            bitbucket_repo.slug(),
+            bitbucket_repo.workspace(),
+        )
+        .await?;
+        Ok(PullRequest::try_from(pr)?)
+    }
+
+    pub async fn get_pull_request_statuses(
+        &self,
+        bitbucket_repo: &BitbucketRepo,
+        pr_id: i32,
+    ) -> Result<PaginatedCommitStatuses, anyhow::Error> {
+        let statuses = repositories_workspace_repo_slug_pullrequests_pull_request_id_statuses_get(
+            &self.configuration,
+            pr_id,
+            bitbucket_repo.slug(),
+            bitbucket_repo.workspace(),
+            None,
+            None,
+        )
+        .await?;
+        Ok(PaginatedCommitStatuses::from(statuses))
     }
 }

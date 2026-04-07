@@ -125,6 +125,7 @@ impl MyPullRequestsTabComponent {
                 pr.clone(),
                 self.bitbucket_client.clone(),
                 self.bitbucket_repo.clone(),
+                self.user_uuid.clone(),
             );
             detail.init();
             self.pr_detail = Some(detail);

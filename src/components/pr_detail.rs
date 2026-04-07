@@ -12,7 +12,10 @@ use ratatui::{
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
-    components::{Component, KeyBinding, KeyEventResponse},
+    components::{
+        Component, KeyBinding, KeyEventResponse,
+        approval_popup::ApprovalPopupComponent,
+    },
     fetcher::{Fetcher, ResourceState},
     models::{
         CommitStatusState, PaginatedCommitStatuses, ParticipantState, PullRequest, PullRequestState,
@@ -28,6 +31,8 @@ pub struct PrDetailComponent {
     scroll_offset: u16,
     bitbucket_client: Arc<BitbucketClient>,
     bitbucket_repo: Arc<BitbucketRepo>,
+    user_uuid: String,
+    approval_popup: Option<ApprovalPopupComponent>,
 }
 
 impl PrDetailComponent {
@@ -35,6 +40,7 @@ impl PrDetailComponent {
         pr: PullRequest,
         bitbucket_client: Arc<BitbucketClient>,
         bitbucket_repo: Arc<BitbucketRepo>,
+        user_uuid: String,
     ) -> Self {
         Self {
             pr,
@@ -45,7 +51,34 @@ impl PrDetailComponent {
             scroll_offset: 0,
             bitbucket_client,
             bitbucket_repo,
+            user_uuid,
+            approval_popup: None,
         }
+    }
+
+    fn current_user_state(&self) -> Option<&ParticipantState> {
+        let pr = self.pr_detail.get().unwrap_or(&self.pr);
+        pr.participants
+            .iter()
+            .find(|p| {
+                p.user
+                    .as_ref()
+                    .and_then(|u| u.uuid.as_ref())
+                    .map_or(false, |uuid| uuid == &self.user_uuid)
+            })
+            .and_then(|p| p.state.as_ref())
+    }
+
+    fn open_approval_popup(&mut self) {
+        let current_state = self.current_user_state().cloned();
+        let mut popup = ApprovalPopupComponent::new(
+            current_state.as_ref(),
+            self.bitbucket_client.clone(),
+            self.bitbucket_repo.clone(),
+            self.pr.id,
+        );
+        popup.init();
+        self.approval_popup = Some(popup);
     }
 
     fn fetch_data(&mut self) {
@@ -73,6 +106,14 @@ impl Component for PrDetailComponent {
     }
 
     fn update(&mut self) {
+        if let Some(popup) = self.approval_popup.as_mut() {
+            popup.update();
+            if popup.is_done() {
+                self.approval_popup = None;
+                self.fetch_data();
+            }
+            return;
+        }
         if let ResourceState::Loading = self.pr_detail
             && let Some(fetcher) = self.pr_detail_fetcher.as_mut()
             && let Some(pr) = fetcher.try_get()
@@ -88,7 +129,21 @@ impl Component for PrDetailComponent {
     }
 
     fn handle_event_key(&mut self, key_event: KeyEvent) -> KeyEventResponse {
+        if let Some(popup) = self.approval_popup.as_mut() {
+            return match popup.handle_event_key(key_event) {
+                KeyEventResponse::Consumed => KeyEventResponse::Consumed,
+                KeyEventResponse::Ignored => {
+                    self.approval_popup = None;
+                    KeyEventResponse::Consumed
+                }
+            };
+        }
+
         match key_event.code {
+            KeyCode::Char('a') => {
+                self.open_approval_popup();
+                KeyEventResponse::Consumed
+            }
             KeyCode::Down => {
                 self.scroll_offset = self.scroll_offset.saturating_add(1);
                 KeyEventResponse::Consumed
@@ -112,6 +167,10 @@ impl Component for PrDetailComponent {
                 key: "Up/Down",
                 description: "Scroll",
             },
+            KeyBinding {
+                key: "a",
+                description: "Change approval",
+            },
         ]
     }
 
@@ -123,6 +182,10 @@ impl Component for PrDetailComponent {
             scroll_offset: self.scroll_offset,
         };
         frame.render_widget(widget, area);
+
+        if let Some(popup) = &self.approval_popup {
+            popup.render(frame, area);
+        }
     }
 }
 

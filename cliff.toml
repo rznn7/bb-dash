@@ -21,6 +21,7 @@ commit_parsers = [
     { message = "^style", group = "🎨 Styling" },
     { message = "^test", group = "🧪 Testing" },
     { message = "^chore", group = "🔧 Miscellaneous" },
+    { message = ".*", group = "Other", default_scope = "other"},
 ]
 filter_commits = false
 tag_pattern = "v[0-9].*"

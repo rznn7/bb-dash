@@ -1,4 +1,4 @@
-# bb-dash
+# :bucket: bb-dash
 
 A TUI client for Bitbucket — manage pull requests entirely from the terminal.
 
@@ -12,6 +12,12 @@ A TUI client for Bitbucket — manage pull requests entirely from the terminal.
 - Open a PR in the browser or copy its link to the clipboard
 - In-app help popup with keybinding reference
 
+## Installation
+
+```sh
+cargo install --git https://github.com/rznn7/bb-dash.git
+```
+
 ## Setup
 
 Requires two environment variables (or a `.env` file):
@@ -21,6 +27,3 @@ BITBUCKET_USERNAME=your-username
 BITBUCKET_API_TOKEN=your-app-password
 ```
 
-## Stack
-
-Rust with Tokio and Ratatui

@@ -45,6 +45,7 @@ impl BitbucketClient {
         bitbucket_repo: &BitbucketRepo,
         state: Option<&str>,
         q: Option<&str>,
+        pagelen: Option<i32>,
     ) -> Result<PaginatedPullRequests, anyhow::Error> {
         let workspace = bitbucket_repo.workspace();
         let repo_slug = bitbucket_repo.slug();
@@ -54,6 +55,7 @@ impl BitbucketClient {
             workspace,
             state,
             q,
+            pagelen,
         )
         .await?
         .into();
@@ -73,7 +75,8 @@ impl BitbucketClient {
             bitbucket_repo.workspace(),
         )
         .await?;
-        Ok(PullRequest::try_from(pr)?)
+
+        PullRequest::try_from(pr)
     }
 
     pub async fn approve_pull_request(

@@ -17,8 +17,9 @@ use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
     components::{Component, KeyBinding, KeyEventResponse, pr_detail::PrDetailComponent},
+    debug_pretty,
     fetcher::{Fetcher, ResourceState},
-    models::{PaginatedPullRequests, PullRequest, PullRequestState},
+    models::{PaginatedPullRequests, ParticipantState, PullRequest, PullRequestState},
 };
 
 const LOADING_TEXT: &str = "...";
@@ -26,6 +27,7 @@ const LOADING_TEXT: &str = "...";
 pub struct MyPullRequestsTabComponent {
     my_pull_requests: ResourceState<PaginatedPullRequests>,
     my_pull_requests_fetcher: Option<Fetcher<PaginatedPullRequests>>,
+    pr_details_fetchers: Vec<(usize, Fetcher<PullRequest>)>,
     bitbucket_client: Arc<BitbucketClient>,
     bitbucket_repo: Arc<BitbucketRepo>,
     user_uuid: String,
@@ -43,6 +45,7 @@ impl MyPullRequestsTabComponent {
         Self {
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
+            pr_details_fetchers: Vec::new(),
             bitbucket_client,
             bitbucket_repo,
             user_uuid,
@@ -54,6 +57,7 @@ impl MyPullRequestsTabComponent {
 
     fn fetch_pull_requests(&mut self) {
         self.my_pull_requests = ResourceState::Loading;
+        self.pr_details_fetchers.clear();
         self.my_pull_requests_fetcher = {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
@@ -61,9 +65,32 @@ impl MyPullRequestsTabComponent {
             // let q = format!("author.uuid = \"{}\" AND state = \"open\"", self.user_uuid);
             let q = String::new();
             Some(Fetcher::new(async move {
-                client.list_pull_requests(&repo, None, Some(&q)).await
+                client
+                    .list_pull_requests(&repo, None, Some(&q), Some(10))
+                    .await
             }))
         };
+    }
+
+    fn spawn_pr_detail_fetchers(&mut self) {
+        let Some(paginated) = self.my_pull_requests.get() else {
+            return;
+        };
+        let Some(prs) = paginated.values.as_ref() else {
+            return;
+        };
+        self.pr_details_fetchers = prs
+            .iter()
+            .enumerate()
+            .map(|(i, pr)| {
+                let client = self.bitbucket_client.clone();
+                let repo = self.bitbucket_repo.clone();
+                let pr_id = pr.id;
+                (i, Fetcher::new(async move {
+                    client.get_pull_request(&repo, pr_id).await
+                }))
+            })
+            .collect();
     }
 
     fn select_pr_down(&mut self) {
@@ -159,6 +186,20 @@ impl Component for MyPullRequestsTabComponent {
             && let Some(pr) = pr_fetcher.try_get()
         {
             self.my_pull_requests = ResourceState::Loaded(pr);
+            self.spawn_pr_detail_fetchers();
+        }
+
+        // Poll detail fetchers and update participants as they resolve
+        if let ResourceState::Loaded(ref mut paginated) = self.my_pull_requests {
+            if let Some(ref mut prs) = paginated.values {
+                for (idx, fetcher) in &mut self.pr_details_fetchers {
+                    if let Some(detail) = fetcher.try_get() {
+                        if let Some(pr) = prs.get_mut(*idx) {
+                            pr.participants = detail.participants;
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -260,6 +301,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
             let mut max_id_len = 0usize;
             let mut max_state_len = 0usize;
             let mut max_author_len = 0usize;
+            let mut max_approval_len = 0usize;
 
             let labels: Vec<_> = prs
                 .iter()
@@ -281,9 +323,30 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                         .and_then(|account| account.display_name.as_ref())
                         .map_or(String::from("?"), |display_name| display_name.clone());
 
+                    debug_pretty!(pr);
+
+                    let approved_count = pr
+                        .participants
+                        .iter()
+                        .filter(|p| matches!(p.state, Some(ParticipantState::Approved)))
+                        .count();
+                    let changes_count = pr
+                        .participants
+                        .iter()
+                        .filter(|p| matches!(p.state, Some(ParticipantState::ChangesRequested)))
+                        .count();
+
+                    let approval_label = match (approved_count, changes_count) {
+                        (0, 0) => "-".to_string(),
+                        (a, 0) => format!("✓{a}"),
+                        (0, c) => format!("!{c}"),
+                        (a, c) => format!("✓{a} !{c}"),
+                    };
+
                     max_id_len = max_id_len.max(id_label.len());
                     max_state_len = max_state_len.max(state_label.len());
                     max_author_len = max_author_len.max(author_label.len());
+                    max_approval_len = max_approval_len.max(approval_label.len());
 
                     (
                         id_label,
@@ -291,6 +354,9 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                         title_label,
                         branch_label,
                         author_label,
+                        approval_label,
+                        approved_count,
+                        changes_count,
                         &pr.state,
                     )
                 })
@@ -302,7 +368,17 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                 .map(
                     |(
                         i,
-                        (id_label, state_label, title_label, branch_label, author_label, state),
+                        (
+                            id_label,
+                            state_label,
+                            title_label,
+                            branch_label,
+                            author_label,
+                            _approval_label,
+                            approved_count,
+                            changes_count,
+                            state,
+                        ),
                     )| {
                         let row_style = if self.selected_pr_idx == Some(i) {
                             Style::new().add_modifier(Modifier::REVERSED)
@@ -319,6 +395,25 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                         }
                         .add_modifier(Modifier::DIM);
 
+                        let approval_cell = match (*approved_count, *changes_count) {
+                            (0, 0) => Cell::from(
+                                Span::from("-").style(Style::new().add_modifier(Modifier::DIM)),
+                            ),
+                            (a, 0) => Cell::from(Span::styled(
+                                format!("✓{a}"),
+                                Style::new().fg(Color::Green),
+                            )),
+                            (0, c) => Cell::from(Span::styled(
+                                format!("!{c}"),
+                                Style::new().fg(Color::Yellow),
+                            )),
+                            (a, c) => Cell::from(Line::from(vec![
+                                Span::styled(format!("✓{a}"), Style::new().fg(Color::Green)),
+                                Span::raw(" "),
+                                Span::styled(format!("!{c}"), Style::new().fg(Color::Yellow)),
+                            ])),
+                        };
+
                         Row::new(vec![
                             Cell::from(
                                 Span::from(id_label.as_str())
@@ -326,6 +421,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                             ),
                             Cell::from(Span::from(author_label.as_str())),
                             Cell::from(Span::from(state_label.as_str()).style(state_label_style)),
+                            approval_cell,
                             Cell::from(Line::from(vec![
                                 Span::from(title_label.as_str()),
                                 Span::from(format!("  {branch_label}"))
@@ -341,6 +437,7 @@ impl Widget for MyPullRequestsTabWidget<'_> {
                 Constraint::Length(max_id_len as u16),
                 Constraint::Length(max_author_len as u16),
                 Constraint::Length(max_state_len as u16),
+                Constraint::Length(max_approval_len as u16),
                 Constraint::Fill(1),
             ];
             Table::new(rows, widths).column_spacing(1).render(area, buf);

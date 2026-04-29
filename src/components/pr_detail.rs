@@ -3,7 +3,8 @@ use std::sync::Arc;
 use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
-    layout::Rect,
+    buffer::Buffer,
+    layout::{Constraint, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Paragraph, Widget},
@@ -15,6 +16,7 @@ use crate::{
     components::{
         Component, KeyBinding, KeyEventResponse,
         approval_popup::ApprovalPopupComponent,
+        checkout_status::CheckoutController,
     },
     fetcher::{Fetcher, ResourceState},
     models::{
@@ -33,6 +35,7 @@ pub struct PrDetailComponent {
     bitbucket_repo: Arc<BitbucketRepo>,
     user_uuid: String,
     approval_popup: Option<ApprovalPopupComponent>,
+    checkout: CheckoutController,
 }
 
 impl PrDetailComponent {
@@ -42,6 +45,7 @@ impl PrDetailComponent {
         bitbucket_repo: Arc<BitbucketRepo>,
         user_uuid: String,
     ) -> Self {
+        let checkout = CheckoutController::new(bitbucket_repo.clone());
         Self {
             pr,
             pr_detail: ResourceState::Loading,
@@ -53,7 +57,18 @@ impl PrDetailComponent {
             bitbucket_repo,
             user_uuid,
             approval_popup: None,
+            checkout,
         }
+    }
+
+    fn checkout_pr(&mut self) {
+        let branch = self
+            .pr
+            .source
+            .as_ref()
+            .and_then(|e| e.branch.as_ref())
+            .map(|b| b.name.clone());
+        self.checkout.start(branch.as_deref());
     }
 
     fn current_user_state(&self) -> Option<&ParticipantState> {
@@ -114,6 +129,7 @@ impl Component for PrDetailComponent {
             }
             return;
         }
+        self.checkout.poll();
         if let ResourceState::Loading = self.pr_detail
             && let Some(fetcher) = self.pr_detail_fetcher.as_mut()
             && let Some(pr) = fetcher.try_get()
@@ -139,9 +155,17 @@ impl Component for PrDetailComponent {
             };
         }
 
+        if !matches!(key_event.code, KeyCode::Char('c')) {
+            self.checkout.clear_if_idle_message();
+        }
+
         match key_event.code {
             KeyCode::Char('a') => {
                 self.open_approval_popup();
+                KeyEventResponse::Consumed
+            }
+            KeyCode::Char('c') => {
+                self.checkout_pr();
                 KeyEventResponse::Consumed
             }
             KeyCode::Down => {
@@ -171,21 +195,46 @@ impl Component for PrDetailComponent {
                 key: "a",
                 description: "Change approval",
             },
+            KeyBinding {
+                key: "c",
+                description: "Checkout PR branch",
+            },
         ]
     }
 
     fn render(&self, frame: &mut Frame, area: Rect) {
+        let (body_area, status_area) = if self.checkout.has_message() {
+            let [b, s] = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).areas(area);
+            (b, Some(s))
+        } else {
+            (area, None)
+        };
+
         let widget = PrDetailWidget {
             pr: &self.pr,
             pr_detail: self.pr_detail.get(),
             statuses: self.statuses.get(),
             scroll_offset: self.scroll_offset,
         };
-        frame.render_widget(widget, area);
+        frame.render_widget(widget, body_area);
+        if let Some(s) = status_area {
+            let checkout = &self.checkout;
+            frame.render_widget(CheckoutStatusLine { checkout }, s);
+        }
 
         if let Some(popup) = &self.approval_popup {
             popup.render(frame, area);
         }
+    }
+}
+
+struct CheckoutStatusLine<'a> {
+    checkout: &'a CheckoutController,
+}
+
+impl Widget for CheckoutStatusLine<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        self.checkout.render_line(area, buf);
     }
 }
 

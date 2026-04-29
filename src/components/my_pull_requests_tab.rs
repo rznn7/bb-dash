@@ -6,7 +6,7 @@ use crossterm::event::{KeyCode, KeyEvent};
 use ratatui::{
     Frame,
     buffer::Buffer,
-    layout::{Constraint, Rect},
+    layout::{Constraint, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Cell, Paragraph, Row, Table, Widget},
@@ -16,7 +16,10 @@ use tracing::error;
 use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
-    components::{Component, KeyBinding, KeyEventResponse, pr_detail::PrDetailComponent},
+    components::{
+        Component, KeyBinding, KeyEventResponse, checkout_status::CheckoutController,
+        pr_detail::PrDetailComponent,
+    },
     debug_pretty,
     fetcher::{Fetcher, ResourceState},
     models::{PaginatedPullRequests, ParticipantState, PullRequest, PullRequestState},
@@ -34,6 +37,7 @@ pub struct MyPullRequestsTabComponent {
     selected_pr_idx: usize,
     clipboard: Clipboard,
     pr_detail: Option<PrDetailComponent>,
+    checkout: CheckoutController,
 }
 
 impl MyPullRequestsTabComponent {
@@ -42,6 +46,7 @@ impl MyPullRequestsTabComponent {
         bitbucket_repo: Arc<BitbucketRepo>,
         user_uuid: String,
     ) -> Self {
+        let checkout = CheckoutController::new(bitbucket_repo.clone());
         Self {
             my_pull_requests: ResourceState::Loading,
             my_pull_requests_fetcher: None,
@@ -52,7 +57,23 @@ impl MyPullRequestsTabComponent {
             selected_pr_idx: 0,
             clipboard: Clipboard::new().expect("failed to create Clipboard instance"),
             pr_detail: None,
+            checkout,
         }
+    }
+
+    fn checkout_selected_pr(&mut self) {
+        let branch = match self.get_selected_pr() {
+            Ok(pr) => pr
+                .source
+                .as_ref()
+                .and_then(|e| e.branch.as_ref())
+                .map(|b| b.name.clone()),
+            Err(e) => {
+                error!("could not get selected pr: {e}");
+                None
+            }
+        };
+        self.checkout.start(branch.as_deref());
     }
 
     fn fetch_pull_requests(&mut self) {
@@ -181,6 +202,7 @@ impl Component for MyPullRequestsTabComponent {
             detail.update();
             return;
         }
+        self.checkout.poll();
         if let ResourceState::Loading = self.my_pull_requests
             && let Some(pr_fetcher) = self.my_pull_requests_fetcher.as_mut()
             && let Some(pr) = pr_fetcher.try_get()
@@ -214,6 +236,10 @@ impl Component for MyPullRequestsTabComponent {
             };
         }
 
+        if !matches!(key_event.code, KeyCode::Char('c')) {
+            self.checkout.clear_if_idle_message();
+        }
+
         match key_event.code {
             KeyCode::Char('r') => {
                 self.fetch_pull_requests();
@@ -233,6 +259,10 @@ impl Component for MyPullRequestsTabComponent {
             }
             KeyCode::Char('y') => {
                 self.copy_pr_link_to_clipboard();
+                KeyEventResponse::Consumed
+            }
+            KeyCode::Char('c') => {
+                self.checkout_selected_pr();
                 KeyEventResponse::Consumed
             }
             KeyCode::Enter => {
@@ -272,6 +302,10 @@ impl Component for MyPullRequestsTabComponent {
                 key: "y",
                 description: "Copy PR link",
             },
+            KeyBinding {
+                key: "c",
+                description: "Checkout PR branch",
+            },
         ]
     }
 
@@ -280,11 +314,34 @@ impl Component for MyPullRequestsTabComponent {
             detail.render(frame, area);
             return;
         }
+        let (table_area, status_area) = if self.checkout.has_message() {
+            let [t, s] = Layout::vertical([Constraint::Min(0), Constraint::Length(1)]).areas(area);
+            (t, Some(s))
+        } else {
+            (area, None)
+        };
         let widget = MyPullRequestsTabWidget {
             pull_requests: self.my_pull_requests.get(),
             selected_pr_idx: Some(self.selected_pr_idx),
         };
-        frame.render_widget(widget, area);
+        frame.render_widget(widget, table_area);
+        if let Some(s) = status_area {
+            let checkout = &self.checkout;
+            frame.render_widget(
+                CheckoutStatusLine { checkout },
+                s,
+            );
+        }
+    }
+}
+
+struct CheckoutStatusLine<'a> {
+    checkout: &'a CheckoutController,
+}
+
+impl Widget for CheckoutStatusLine<'_> {
+    fn render(self, area: Rect, buf: &mut Buffer) {
+        self.checkout.render_line(area, buf);
     }
 }
 

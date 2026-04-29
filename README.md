@@ -10,6 +10,7 @@ A TUI client for Bitbucket — manage pull requests entirely from the terminal.
 - View PR details: reviewers, build statuses, description
 - Approve, unapprove, request changes, or unrequest changes directly from the TUI
 - Open a PR in the browser or copy its link to the clipboard
+- Check out a PR's source branch in the local repo (`c`)
 - In-app help popup with keybinding reference
 
 ## Installation

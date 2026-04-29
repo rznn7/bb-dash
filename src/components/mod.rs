@@ -5,6 +5,7 @@ use ratatui::layout::Rect;
 pub mod account_connected;
 pub mod app_title;
 pub mod approval_popup;
+pub mod checkout_status;
 pub mod current_repo;
 pub mod help_popup;
 pub mod my_pull_requests_tab;

@@ -82,12 +82,10 @@ impl MyPullRequestsTabComponent {
         self.my_pull_requests_fetcher = {
             let client = self.bitbucket_client.clone();
             let repo = self.bitbucket_repo.clone();
-            // (no filtering for now)
-            // let q = format!("author.uuid = \"{}\" AND state = \"open\"", self.user_uuid);
-            let q = String::new();
+            let q = format!("author.uuid = \"{}\" AND state = \"open\"", self.user_uuid);
             Some(Fetcher::new(async move {
                 client
-                    .list_pull_requests(&repo, None, Some(&q), Some(10))
+                    .list_pull_requests(&repo, None, Some(&q), Some(25))
                     .await
             }))
         };
@@ -107,9 +105,10 @@ impl MyPullRequestsTabComponent {
                 let client = self.bitbucket_client.clone();
                 let repo = self.bitbucket_repo.clone();
                 let pr_id = pr.id;
-                (i, Fetcher::new(async move {
-                    client.get_pull_request(&repo, pr_id).await
-                }))
+                (
+                    i,
+                    Fetcher::new(async move { client.get_pull_request(&repo, pr_id).await }),
+                )
             })
             .collect();
     }
@@ -327,10 +326,7 @@ impl Component for MyPullRequestsTabComponent {
         frame.render_widget(widget, table_area);
         if let Some(s) = status_area {
             let checkout = &self.checkout;
-            frame.render_widget(
-                CheckoutStatusLine { checkout },
-                s,
-            );
+            frame.render_widget(CheckoutStatusLine { checkout }, s);
         }
     }
 }

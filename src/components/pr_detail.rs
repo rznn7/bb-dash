@@ -14,8 +14,7 @@ use crate::{
     bitbucket_client::BitbucketClient,
     bitbucket_repo::BitbucketRepo,
     components::{
-        Component, KeyBinding, KeyEventResponse,
-        approval_popup::ApprovalPopupComponent,
+        Component, KeyBinding, KeyEventResponse, approval_popup::ApprovalPopupComponent,
         checkout_status::CheckoutController,
     },
     fetcher::{Fetcher, ResourceState},
@@ -79,7 +78,7 @@ impl PrDetailComponent {
                 p.user
                     .as_ref()
                     .and_then(|u| u.uuid.as_ref())
-                    .map_or(false, |uuid| uuid == &self.user_uuid)
+                    .is_some_and(|uuid| uuid == &self.user_uuid)
             })
             .and_then(|p| p.state.as_ref())
     }
@@ -156,7 +155,7 @@ impl Component for PrDetailComponent {
         }
 
         if !matches!(key_event.code, KeyCode::Char('c')) {
-            self.checkout.clear_if_idle_message();
+            self.checkout.dismiss_message();
         }
 
         match key_event.code {
@@ -341,7 +340,7 @@ impl Widget for PrDetailWidget<'_> {
                         Some(ParticipantState::ChangesRequested) => {
                             ("!", Style::new().fg(Color::Red))
                         }
-                        None => unreachable!(),
+                        _ => continue,
                     };
                     let name = p
                         .user
@@ -351,7 +350,7 @@ impl Widget for PrDetailWidget<'_> {
                     let state_label = match &p.state {
                         Some(ParticipantState::Approved) => "approved",
                         Some(ParticipantState::ChangesRequested) => "changes requested",
-                        None => unreachable!(),
+                        _ => continue,
                     };
                     lines.push(Line::from(vec![
                         Span::raw("   "),

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use directories::ProjectDirs;
 use lazy_static::lazy_static;
 use tracing_error::ErrorLayer;
-use tracing_subscriber::{self, layer::SubscriberExt, util::SubscriberInitExt, Layer};
+use tracing_subscriber::{self, Layer, layer::SubscriberExt, util::SubscriberInitExt};
 
 lazy_static! {
     pub static ref PROJECT_NAME: String = env!("CARGO_CRATE_NAME").to_uppercase().to_string();
@@ -16,7 +16,7 @@ lazy_static! {
 }
 
 fn project_directory() -> Option<ProjectDirs> {
-    ProjectDirs::from("com", "kdheepak", env!("CARGO_PKG_NAME"))
+    ProjectDirs::from("", "", env!("CARGO_PKG_NAME"))
 }
 
 pub fn get_data_dir() -> PathBuf {

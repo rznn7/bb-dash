@@ -29,6 +29,7 @@ impl BitbucketRepo {
         &self.slug
     }
 
+    #[allow(dead_code)]
     pub fn path(&self) -> &Path {
         &self.path
     }
@@ -63,18 +64,20 @@ impl BitbucketRepo {
             .output()
             .context("failed to run git checkout")?;
         if !checkout.status.success() {
-            bail!("{}", first_err_line(&checkout.stderr, "git checkout failed"));
+            bail!(
+                "{}",
+                first_err_line(&checkout.stderr, "git checkout failed")
+            );
         }
         Ok(())
     }
 
     fn verify_git_repo(repo_path: &str) -> Result<()> {
-        let mut cmd = process::Command::new("git");
-        cmd.args(["rev-parse", "--is-inside-work-tree"]);
-
-        cmd.current_dir(repo_path);
-
-        let output = cmd.output().context("failed to execute git command")?;
+        let output = process::Command::new("git")
+            .args(["rev-parse", "--is-inside-work-tree"])
+            .current_dir(repo_path)
+            .output()
+            .context("failed to execute git command")?;
 
         if !output.status.success() {
             bail!("not in a git repository");
@@ -84,11 +87,11 @@ impl BitbucketRepo {
     }
 
     fn get_repo_workspace_and_slug(repo_path: &str) -> Result<(String, String)> {
-        let mut cmd = process::Command::new("git");
-        cmd.args(["remote", "get-url", "origin"]);
-        cmd.current_dir(repo_path);
-
-        let output = cmd.output().context("failed to execute git command")?;
+        let output = process::Command::new("git")
+            .args(["remote", "get-url", "origin"])
+            .current_dir(repo_path)
+            .output()
+            .context("failed to execute git command")?;
         let remote_url = String::from_utf8(output.stdout)
             .context("failed to convert git origin url to String")?
             .trim()

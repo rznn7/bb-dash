@@ -4,7 +4,6 @@ use crossterm::event::KeyEvent;
 use ratatui::Frame;
 use ratatui::buffer::Buffer;
 use ratatui::prelude::Rect;
-use ratatui::style::Style;
 use ratatui::widgets::Paragraph;
 use ratatui::widgets::Widget;
 
@@ -48,11 +47,7 @@ pub struct AccountConnectedWidget<'a> {
 
 impl AccountConnectedWidget<'_> {
     fn formatted_text(&self) -> String {
-        let name = self
-            .account
-            .display_name
-            .as_deref()
-            .unwrap_or("unknown");
+        let name = self.account.display_name.as_deref().unwrap_or("unknown");
 
         format!("  {} ", name)
     }
@@ -64,8 +59,6 @@ impl AccountConnectedWidget<'_> {
 
 impl Widget for AccountConnectedWidget<'_> {
     fn render(self, area: Rect, buf: &mut Buffer) {
-        Paragraph::new(self.formatted_text())
-            .style(Style::default())
-            .render(area, buf);
+        Paragraph::new(self.formatted_text()).render(area, buf);
     }
 }

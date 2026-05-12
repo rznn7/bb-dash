@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use ratatui::style::Color;
 use ratatui::widgets::Paragraph;
 use tracing::info;
@@ -11,6 +9,7 @@ use crate::{logging::initialize_logging, tui::App};
 use std::env;
 use std::sync::Arc;
 
+mod auth;
 mod bitbucket_client;
 mod bitbucket_repo;
 mod components;
@@ -25,16 +24,30 @@ async fn main() -> Result<(), anyhow::Error> {
 
     info!("app starting");
 
+    let args: Vec<String> = env::args().skip(1).collect();
+    let auth_flag = args.iter().any(|a| a == "--auth");
+    let repo_path = args
+        .iter()
+        .find(|a| !a.starts_with('-'))
+        .cloned()
+        .unwrap_or_else(|| String::from("."));
+
+    if auth_flag {
+        return auth::prompt_and_store();
+    }
+
     let mut terminal = ratatui::init();
     terminal.draw(|frame| {
         frame.render_widget(Paragraph::new("Loading user..."), frame.area());
     })?;
 
-    let (bitbucket_client, bitbucket_repo, account) = initialize().await?;
-    let accent_color = Color::Blue;
-
-    let app = App::new(bitbucket_client, bitbucket_repo, account, accent_color);
-    let result = app.run(terminal).await;
+    let result = async {
+        let (bitbucket_client, bitbucket_repo, account) = initialize(&repo_path).await?;
+        let accent_color = Color::Blue;
+        let app = App::new(bitbucket_client, bitbucket_repo, account, accent_color);
+        app.run(terminal).await
+    }
+    .await;
 
     ratatui::restore();
 
@@ -43,12 +56,29 @@ async fn main() -> Result<(), anyhow::Error> {
     result
 }
 
-async fn initialize() -> Result<(Arc<BitbucketClient>, Arc<BitbucketRepo>, Account), anyhow::Error>
-{
-    let repo_path = env::args().nth(1).unwrap_or(String::from("."));
+fn resolve_client() -> anyhow::Result<BitbucketClient> {
+    dotenv::dotenv().ok();
 
-    let bitbucket_client = Arc::new(BitbucketClient::from_env()?);
-    let bitbucket_repo = Arc::new(BitbucketRepo::new(&repo_path)?);
+    if let (Ok(username), Ok(token)) = (
+        env::var("BITBUCKET_USERNAME"),
+        env::var("BITBUCKET_API_TOKEN"),
+    ) {
+        return Ok(BitbucketClient::new(username, token));
+    }
+
+    match auth::load_stored()? {
+        Some(c) => Ok(BitbucketClient::new(c.username, c.api_token)),
+        None => Err(anyhow::anyhow!(
+            "No credentials found. Run `bb-dash --auth` to store them, or set BITBUCKET_USERNAME and BITBUCKET_API_TOKEN."
+        )),
+    }
+}
+
+async fn initialize(
+    repo_path: &str,
+) -> Result<(Arc<BitbucketClient>, Arc<BitbucketRepo>, Account), anyhow::Error> {
+    let bitbucket_client = Arc::new(resolve_client()?);
+    let bitbucket_repo = Arc::new(BitbucketRepo::new(repo_path)?);
 
     let account = bitbucket_client.get_user().await?;
 

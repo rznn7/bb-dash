@@ -1,10 +1,10 @@
 use crate::components::{Component, KeyEventResponse};
 use crossterm::event::KeyEvent;
+use ratatui::Frame;
 use ratatui::buffer::Buffer;
 use ratatui::prelude::Rect;
 use ratatui::style::{Color, Style};
 use ratatui::widgets::{Paragraph, Widget};
-use ratatui::Frame;
 
 const APP_TITLE_TEXT: &str = "  bb-dash ";
 

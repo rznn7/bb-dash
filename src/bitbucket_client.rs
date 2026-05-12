@@ -23,16 +23,10 @@ pub struct BitbucketClient {
 }
 
 impl BitbucketClient {
-    pub fn from_env() -> Result<Self, std::env::VarError> {
-        dotenv::dotenv().ok();
-
-        let username = std::env::var("BITBUCKET_USERNAME")?;
-        let api_token = std::env::var("BITBUCKET_API_TOKEN")?;
-
+    pub fn new(username: String, api_token: String) -> Self {
         let mut configuration = Configuration::new();
         configuration.basic_auth = Some((username, Some(api_token)));
-
-        Ok(BitbucketClient { configuration })
+        BitbucketClient { configuration }
     }
 
     pub async fn get_user(&self) -> Result<Account, anyhow::Error> {

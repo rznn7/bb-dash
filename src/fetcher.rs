@@ -24,6 +24,7 @@ impl<T> Fetcher<T> {
 pub enum ResourceState<T> {
     Loading,
     Loaded(T),
+    #[allow(dead_code)]
     Failed,
 }
 

@@ -236,7 +236,7 @@ impl Component for MyPullRequestsTabComponent {
         }
 
         if !matches!(key_event.code, KeyCode::Char('c')) {
-            self.checkout.clear_if_idle_message();
+            self.checkout.dismiss_message();
         }
 
         match key_event.code {

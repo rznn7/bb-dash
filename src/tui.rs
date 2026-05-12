@@ -22,6 +22,7 @@ use std::time::Duration;
 use strum::{Display, EnumIter, FromRepr, IntoEnumIterator};
 use tracing::info;
 
+#[allow(dead_code)]
 pub struct App {
     is_running: bool,
     accent_color: Color,

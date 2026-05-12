@@ -89,7 +89,7 @@ impl CheckoutController {
         }
     }
 
-    pub fn clear_if_idle_message(&mut self) {
+    pub fn dismiss_message(&mut self) {
         if matches!(
             self.status,
             CheckoutStatus::Success(_) | CheckoutStatus::Error(_)
@@ -105,9 +105,7 @@ impl CheckoutController {
                 format!(" checking out {b}..."),
                 Style::default().add_modifier(Modifier::DIM),
             ),
-            CheckoutStatus::Success(msg) => {
-                (format!(" {msg}"), Style::default().fg(Color::Green))
-            }
+            CheckoutStatus::Success(msg) => (format!(" {msg}"), Style::default().fg(Color::Green)),
             CheckoutStatus::Error(msg) => (format!(" {msg}"), Style::default().fg(Color::Red)),
         };
         Paragraph::new(Span::styled(text, style)).render(area, buf);

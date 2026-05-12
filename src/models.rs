@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use anyhow::{self};
 use bitbucket_client::models::{ApiAccount, ApiAccountLinks, ApiLink};
 use bitbucket_client::models::{
@@ -254,9 +256,7 @@ pub struct Participant {
 impl From<ApiParticipant> for Participant {
     fn from(api: ApiParticipant) -> Self {
         Self {
-            user: api
-                .user
-                .map(|boxed| Box::new(Account::from(*boxed))),
+            user: api.user.map(|boxed| Box::new(Account::from(*boxed))),
             role: api.role.map(Into::into),
             approved: api.approved,
             state: api.state.map(Into::into),
